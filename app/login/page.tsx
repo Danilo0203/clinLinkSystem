@@ -7,13 +7,28 @@ import { Password } from 'primereact/password';
 import { RiLockPasswordLine } from "react-icons/ri";
 import { Button } from 'primereact/button';
 import Link from 'next/link';
-
+import {useForm, } from 'react-hook-form';
+import { Dialog } from 'primereact/dialog';
+import ForgotPasswordModal from "../contraseña/page";
 
 export default function login() {
-    const [ value,setValue] = useState('');
-    const [passwordValue, setPasswordValue] = useState('');
-    const handleSubmit = (e:React.FormEvent)=>{e.preventDefault}
+    const { register, handleSubmit,formState: { errors }, } = useForm()
+    const onSubmit = handleSubmit((data) =>{
+      console.log(data);
+    } )
+    //Variables Modal
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+
+    const handleOpenModal = () => {
+        setIsModalVisible(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalVisible(false);
+    };
+    
     return (
+      
       <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
         
         <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
@@ -28,38 +43,37 @@ export default function login() {
                         </h2>
                         <div className="border-2 w-10 border-lime-400 inline-block mb-2"></div>
                         <p className='text-gray-400 my-3'>Usuario</p>
-                        <div className="flex felx-col items-center">
+                        <div className=" flex flex-col items-center justify-center">
                             <div className='relative w-64 p-3 mb-4 flex items-center'>
-                              <form action="" onSubmit={handleSubmit} className="space-y-7 ">
+                              <form action="" onSubmit={onSubmit} className="space-y-7 w-full flex-col  ">
                            
                                   <FloatLabel>
-                                    <InputText id="username" value={value} onChange={(e) => setValue(e.target.value)} type="email" className="" />
+                                    <InputText id="username"  type="email" className="" {...register('username', {required: true, maxLength:60, minLength:8})} />
                                   
                                     <label htmlFor="username" className="flex"> <FaRegEnvelope className='text-gray-400 mr-2 flex-1' /> Usuario</label>
                                   </FloatLabel>
                                   <FloatLabel>
-                                   <Password id="password" value={passwordValue} onChange={(e) => setPasswordValue(e.target.value)} feedback={false} tabIndex={1} />   
+                                   <InputText id="password" type="password" {...register('password', { required: "El campo es requerido" })} />   
                                     <label htmlFor="password" className="flex"><RiLockPasswordLine className='text-gray-400 mr-2 flex-1' />Contraseña: </label>
                                   </FloatLabel>
                                   <div className="flex w-64 mb-5">
-                                      <a href="#" className="text-xs">¿Olvido su contraseña?</a>
+                                  
+                                  <Link href={''} onClick={handleOpenModal} className="text-sm"
+                                    > ¿Olvido su contraseña? </Link>
                                       
                                   </div>
+                                  <ForgotPasswordModal visible={isModalVisible} onHide={handleCloseModal} />
+                                  
+
+
                                   <div>
-                                   <Button label="" link onClick={() => window.open('/app/login/registro.tsx', '_blank')} />
-                                   <a href="/app/login/registro.tsx" target="_blank" rel="noopener noreferrer" className="p-button font-bold">
-                                    Login
-                                  </a>
+                                   <Button  className="bg-lime-400 text-white px-4 py-2 rounded" label="Login" link  />
+                                   
                                  </div>
                                     
                               </form>
                             </div>
-                            
-
                         </div>
-                       
-                       
-
                     </div>
                 </div>
                 <div className=" max-w-3xl p-5 w-2/5 bg-lime-400 text-white  rounded-br-2xl py-36 px-12" >
@@ -81,9 +95,13 @@ export default function login() {
                 
                 </div>
             </div>
-
+           
         </main>
+       
       </div>
+      
+
+      
     )
 }
 
