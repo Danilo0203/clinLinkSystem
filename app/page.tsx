@@ -1,36 +1,56 @@
 "use client";
-import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
-import { useState } from "react";
+import { Menubar } from "primereact/menubar";
 
 export default function Home() {
-  const [visible, setVisible] = useState(false);
-
+  const items = [
+    {
+      label: "Home",
+      icon: "pi pi-home",
+    },
+    {
+      label: "Features",
+      icon: "pi pi-star",
+    },
+    {
+      label: "Projects",
+      icon: "pi pi-search",
+      items: [
+        {
+          label: "Components",
+          icon: "pi pi-bolt",
+        },
+        {
+          label: "Blocks",
+          icon: "pi pi-server",
+        },
+        {
+          label: "UI Kit",
+          icon: "pi pi-pencil",
+        },
+        {
+          label: "Templates",
+          icon: "pi pi-palette",
+          items: [
+            {
+              label: "Apollo",
+              icon: "pi pi-palette",
+            },
+            {
+              label: "Ultima",
+              icon: "pi pi-palette",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      label: "Contact",
+      icon: "pi pi-envelope",
+    },
+  ];
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main>
-        <div className="card flex justify-content-center">
-          <Button label="Hola mundo" icon="pi pi-check" size="large" />
-          <Button label="Show" icon="pi pi-external-link" onClick={() => setVisible(true)} />
-          <Dialog
-            header="Header"
-            visible={visible}
-            style={{ width: "50vw" }}
-            onHide={() => {
-              if (!visible) return;
-              setVisible(false);
-            }}
-          >
-            <p className="m-0">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
-              ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-              fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-              mollit anim id est laborum.
-            </p>
-          </Dialog>
-        </div>
-      </main>
-    </div>
+    <main>
+      <Menubar model={items} />
+    </main>
   );
 }
