@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 'use client';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
@@ -16,9 +15,7 @@ import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
 import { ProductService } from '../../../../demo/service/ProductService';
 import { Demo } from '@/types';
-
-/* @todo Used 'as any' for types here. Will fix in next version due to onSelectionChange event type issue. */
-const Crud = () => {
+export default function PageRoles() {
     let emptyProduct: Demo.Product = {
         id: '',
         name: '',
@@ -425,6 +422,4 @@ const Crud = () => {
             </div>
         </div>
     );
-};
-
-export default Crud;
+}

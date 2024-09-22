@@ -6,20 +6,20 @@ interface AppLayoutProps {
 }
 
 export const metadata: Metadata = {
-    title: 'PrimeReact Sakai',
-    description: 'The ultimate collection of design-agnostic, flexible and accessible React UI Components.',
+    title: 'ClinkLink',
+    description: 'Sistema de control de horarios y reservas de salas de clinicas medicas.',
     robots: { index: false, follow: false },
     viewport: { initialScale: 1, width: 'device-width' },
     openGraph: {
         type: 'website',
-        title: 'PrimeReact SAKAI-REACT',
+        title: 'ClinkLink',
         url: 'https://sakai.primereact.org/',
         description: 'The ultimate collection of design-agnostic, flexible and accessible React UI Components.',
         images: ['https://www.primefaces.org/static/social/sakai-react.png'],
         ttl: 604800
     },
     icons: {
-        icon: '/favicon.ico'
+        icon: '/layout/images/Logo.png'
     }
 };
 
