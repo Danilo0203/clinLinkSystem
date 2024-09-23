@@ -17,6 +17,7 @@ const AppMenu = () => {
             label: 'Usuarios',
             items: [
                 { label: 'Roles', icon: 'pi pi-fw pi-user', to: '/usuarios/roles' },
+                { label: 'Usuarios', icon: 'pi pi-fw pi-users', to: '/usuarios/usuarios' },
                 { label: 'Permisos', icon: 'pi pi-fw pi-wrench', url: 'https://primeflex.org/', target: '_blank' }
             ]
         },
