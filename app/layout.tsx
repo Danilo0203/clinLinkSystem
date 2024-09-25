@@ -1,36 +1,30 @@
-import type { Metadata } from "next";
-import { PrimeReactProvider } from "primereact/api";
-import localFont from "next/font/local";
-import "./globals.css";
-import "primereact/resources/themes/lara-light-cyan/theme.css";
-import "primeicons/primeicons.css";
+'use client';
+import { LayoutProvider } from '../layout/context/layoutcontext';
+import { PrimeReactProvider } from 'primereact/api';
+import 'primereact/resources/primereact.css';
+import 'primeflex/primeflex.css';
+import 'primeicons/primeicons.css';
+import '../styles/layout/layout.scss';
+import '../styles/demo/Demos.scss';
+import Providers from './Providers';
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+interface RootLayoutProps {
+    children: React.ReactNode;
+}
 
-export const metadata: Metadata = {
-  title: "ClinLink",
-  description: "Sistema de reserva de citas",
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <PrimeReactProvider>{children}</PrimeReactProvider>
-      </body>
-    </html>
-  );
+export default function RootLayout({ children }: RootLayoutProps) {
+    return (
+        <html lang="en" suppressHydrationWarning>
+            <head>
+                <link id="theme-css" href={`/themes/lara-light-indigo/theme.css`} rel="stylesheet"></link>
+            </head>
+            <body>
+                <PrimeReactProvider>
+                    <LayoutProvider>
+                        <Providers>{children}</Providers>
+                    </LayoutProvider>
+                </PrimeReactProvider>
+            </body>
+        </html>
+    );
 }
