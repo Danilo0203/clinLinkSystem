@@ -1,109 +1,84 @@
-"use client";
-import React, { useState } from "react";
-import { FaRegEnvelope } from 'react-icons/fa'
-import { InputText } from "primereact/inputtext";
-import { FloatLabel } from 'primereact/floatlabel';
-import { Password } from 'primereact/password';
-import { RiLockPasswordLine } from "react-icons/ri";
-import { Button } from 'primereact/button';
+'use client';
+import { AxiosError } from 'axios';
+import { signIn } from 'next-auth/react';
 import Link from 'next/link';
-import {useForm, } from 'react-hook-form';
-import { Dialog } from 'primereact/dialog';
-import ForgotPasswordModal from "../contraseña/page";
+import { useRouter } from 'next/navigation';
+import { Button } from 'primereact/button';
+import { FloatLabel } from 'primereact/floatlabel';
+import { InputText } from 'primereact/inputtext';
+import { Password } from 'primereact/password';
+import React from 'react';
+import { useForm, Controller } from 'react-hook-form';
 
-export default function login() {
-    const { register, handleSubmit,formState: { errors }, } = useForm()
-    const onSubmit = handleSubmit((data) =>{
-      console.log(data);
-    } )
-    //Variables Modal
-    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-
-    const handleOpenModal = () => {
-        setIsModalVisible(true);
+const LogingPage = () => {
+    const router = useRouter();
+    const { register, handleSubmit, control } = useForm();
+    const onSubmit = async (data: any) => {
+        try {
+            const res = await signIn('credentials', {
+                email: data.email,
+                password: data.password,
+                password_confirmation: data.password_confirmation,
+                redirect: false
+            });
+            if (res?.ok) return router.push('/dashboard');
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                console.error(error.response?.data);
+            }
+        }
     };
-
-    const handleCloseModal = () => {
-        setIsModalVisible(false);
-    };
-    
     return (
-      
-      <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
-        
-        <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
-            <div className="bg-white rounded-2xl shadow-2xl flex w-2/3 max-w-4xl">
-                <div className="w-3/5 max-w-3xl p-5"  >
-                    <div className="text-left font-bold">
-                        <span className="text-left text-lime-400" >Clin</span>Click
-                    </div>
-                    <div className="py-10">
-                        <h2 className="text-3xl font-bold text-lime-400 mb-2 ">
-                            Inicia Sesion
-                        </h2>
-                        <div className="border-2 w-10 border-lime-400 inline-block mb-2"></div>
-                        <p className='text-gray-400 my-3'>Usuario</p>
-                        <div className=" flex flex-col items-center justify-center">
-                            <div className='relative w-64 p-3 mb-4 flex items-center'>
-                              <form action="" onSubmit={onSubmit} className="space-y-7 w-full flex-col  ">
-                           
-                                  <FloatLabel>
-                                    <InputText id="username"  type="email" className="" {...register('username', {required: true, maxLength:60, minLength:8})} />
-                                  
-                                    <label htmlFor="username" className="flex"> <FaRegEnvelope className='text-gray-400 mr-2 flex-1' /> Usuario</label>
-                                  </FloatLabel>
-                                  <FloatLabel>
-                                   <InputText id="password" type="password" {...register('password', { required: "El campo es requerido" })} />   
-                                    <label htmlFor="password" className="flex"><RiLockPasswordLine className='text-gray-400 mr-2 flex-1' />Contraseña: </label>
-                                  </FloatLabel>
-                                  <div className="flex w-64 mb-5">
-                                  
-                                  <Link href={''} onClick={handleOpenModal} className="text-sm"
-                                    > ¿Olvido su contraseña? </Link>
-                                      
-                                  </div>
-                                  <ForgotPasswordModal visible={isModalVisible} onHide={handleCloseModal} />
-                                  
+        <div className="min-h-screen text-center py-5">
+            <h2>Formulario de Inicio de sesión</h2>
+            <form onSubmit={handleSubmit(onSubmit)} className="flex align-items-center justify-content-center">
+                <div className="flex flex-column gap-5 py-2">
+                    <FloatLabel>
+                        <InputText id="email" {...register('email')} />
+                        <label htmlFor="email">Correo</label>
+                    </FloatLabel>
 
+                    <FloatLabel>
+                        <Controller
+                            name="password"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                                <Password
+                                    {...field}
+                                    inputId="password"
+                                    feedback={false}
+                                    toggleMask
+                                    type="password" // Cambiado a "password" para mayor seguridad
+                                />
+                            )}
+                        />
+                        <label htmlFor="password">Contraseña</label>
+                    </FloatLabel>
 
-                                  <div>
-                                   <Button  className="bg-lime-400 text-white px-4 py-2 rounded" label="Login" link  />
-                                   
-                                 </div>
-                                    
-                              </form>
-                            </div>
-                        </div>
-                    </div>
+                    <FloatLabel>
+                        <Controller
+                            name="password_confirmation"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                                <Password
+                                    {...field}
+                                    inputId="password_confirmation"
+                                    feedback={false}
+                                    toggleMask
+                                    type="password" // Cambiado a "password" para mayor seguridad
+                                />
+                            )}
+                        />
+                        <label htmlFor="password_confirmation">Confirmar Contraseña</label>
+                    </FloatLabel>
+                    <Button label="Iniciar Sesión" type="submit" className="p-button-raised p-button-rounded p-button-primary" />
+                    <Link href="/register">Registrarse</Link>
                 </div>
-                <div className=" max-w-3xl p-5 w-2/5 bg-lime-400 text-white  rounded-br-2xl py-36 px-12" >
-                    <h2 className="text-3xl font-bold mb-2">Bienvenido</h2>
-                    <div className="border-2 w-10 border-white inline-block mb-2"> 
-                    </div>
-                    <div>
-                    <p className="mb-10">Registrate, empieza una vida sana con nosotros</p>
-                    <Link className="border-2 border-white rounded-full px-12 py-2 inline-block font-semibold hover:bg-white hover:text-black"
-                         href={{
-                            pathname: '/registro',
-                            query: {name: 'page'},
-                        }}
-                    > Registrate
-                       
-                    </Link>
+            </form>
+        </div>
+    );
+};
 
-                    </div>
-                
-                </div>
-            </div>
-           
-        </main>
-       
-      </div>
-      
-
-      
-    )
-}
-
-
-
+export default LogingPage;
