@@ -14,44 +14,38 @@ import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
 import { ProductService } from '../../../../demo/service/ProductService';
 import { Demo } from '@/types';
+import { RolesService } from '@/libs/endpoints/usuarios/rolesApi';
+import { Dropdown } from 'primereact/dropdown';
+import { useForm } from 'react-hook-form';
 
-export default function PageRoles() {
-    let emptyProduct: Demo.Product = {
-        id: '',
-        name: '',
-        image: '',
-        description: '',
-        category: '',
-        price: 0,
-        quantity: 0,
-        rating: 0,
-        inventoryStatus: 'INSTOCK'
+export default function PageUsuarios() {
+    let emptyProduct = {
+        first_name: '',
+        last_name: '',
+        phone_number: '',
+        email: '',
+        role: ''
     };
 
-    const [products, setProducts] = useState(null);
+    const [usuarios, setUsuarios] = useState(null);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
-    const [product, setProduct] = useState<Demo.Product>(emptyProduct);
+    const [usuario, setUsuario] = useState(emptyProduct);
     const [selectedProducts, setSelectedProducts] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState('');
+    const { register, handleSubmit } = useForm();
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
 
     useEffect(() => {
-        ProductService.getProducts().then((data) => setProducts(data as any));
+        RolesService.getListarRoles().then((data) => setUsuarios(data.data as any));
+        // ProductService.getProducts().then((data) => setUsuarios(data as any));
     }, []);
 
-    const formatCurrency = (value: number) => {
-        return value.toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD'
-        });
-    };
-
     const openNew = () => {
-        setProduct(emptyProduct);
+        setUsuario(emptyProduct);
         setSubmitted(false);
         setProductDialog(true);
     };
@@ -69,55 +63,56 @@ export default function PageRoles() {
         setDeleteProductsDialog(false);
     };
 
-    const saveProduct = () => {
+    const saveProduct = (data) => {
+        console.log(data);
         setSubmitted(true);
 
-        if (product.name.trim()) {
-            let _products = [...(products as any)];
-            let _product = { ...product };
-            if (product.id) {
-                const index = findIndexById(product.id);
+        // if (usuario.first_name.trim()) {
+        //     let _usuarios = [...(usuarios as any)];
+        //     let _product = { ...usuario };
+        //     if (usuario.id) {
+        //         const index = findIndexById(usuario.id);
 
-                _products[index] = _product;
-                toast.current?.show({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Updated',
-                    life: 3000
-                });
-            } else {
-                _product.id = createId();
-                _product.image = 'product-placeholder.svg';
-                _products.push(_product);
-                toast.current?.show({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Created',
-                    life: 3000
-                });
-            }
+        //         _usuarios[index] = _product;
+        //         toast.current?.show({
+        //             severity: 'success',
+        //             summary: 'Successful',
+        //             detail: 'Product Updated',
+        //             life: 3000
+        //         });
+        //     } else {
+        //         _product.id = createId();
+        //         _product.image = 'usuario-placeholder.svg';
+        //         _usuarios.push(_product);
+        //         toast.current?.show({
+        //             severity: 'success',
+        //             summary: 'Successful',
+        //             detail: 'Product Created',
+        //             life: 3000
+        //         });
+        //     }
 
-            setProducts(_products as any);
-            setProductDialog(false);
-            setProduct(emptyProduct);
-        }
+        // }
+        // setUsuarios(_usuarios as any);
+        // setProductDialog(false);
+        // setUsuario(emptyProduct);
     };
 
-    const editProduct = (product: Demo.Product) => {
-        setProduct({ ...product });
+    const editProduct = (usuario: Demo.Product) => {
+        setUsuario({ ...usuario });
         setProductDialog(true);
     };
 
-    const confirmDeleteProduct = (product: Demo.Product) => {
-        setProduct(product);
+    const confirmDeleteProduct = (usuario: Demo.Product) => {
+        setUsuario(usuario);
         setDeleteProductDialog(true);
     };
 
     const deleteProduct = () => {
-        let _products = (products as any)?.filter((val: any) => val.id !== product.id);
-        setProducts(_products);
+        let _usuarios = (usuarios as any)?.filter((val: any) => val.id !== usuario.id);
+        setUsuarios(_usuarios);
         setDeleteProductDialog(false);
-        setProduct(emptyProduct);
+        setUsuario(emptyProduct);
         toast.current?.show({
             severity: 'success',
             summary: 'Successful',
@@ -128,8 +123,8 @@ export default function PageRoles() {
 
     const findIndexById = (id: string) => {
         let index = -1;
-        for (let i = 0; i < (products as any)?.length; i++) {
-            if ((products as any)[i].id === id) {
+        for (let i = 0; i < (usuarios as any)?.length; i++) {
+            if ((usuarios as any)[i].id === id) {
                 index = i;
                 break;
             }
@@ -156,8 +151,8 @@ export default function PageRoles() {
     };
 
     const deleteSelectedProducts = () => {
-        let _products = (products as any)?.filter((val: any) => !(selectedProducts as any)?.includes(val));
-        setProducts(_products);
+        let _usuarios = (usuarios as any)?.filter((val: any) => !(selectedProducts as any)?.includes(val));
+        setUsuarios(_usuarios);
         setDeleteProductsDialog(false);
         setSelectedProducts(null);
         toast.current?.show({
@@ -169,25 +164,25 @@ export default function PageRoles() {
     };
 
     const onCategoryChange = (e: RadioButtonChangeEvent) => {
-        let _product = { ...product };
+        let _product = { ...usuario };
         _product['category'] = e.value;
-        setProduct(_product);
+        setUsuario(_product);
     };
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, name: string) => {
         const val = (e.target && e.target.value) || '';
-        let _product = { ...product };
+        let _product = { ...usuario };
         _product[`${name}`] = val;
 
-        setProduct(_product);
+        setUsuario(_product);
     };
 
     const onInputNumberChange = (e: InputNumberValueChangeEvent, name: string) => {
         const val = e.value || 0;
-        let _product = { ...product };
+        let _product = { ...usuario };
         _product[`${name}`] = val;
 
-        setProduct(_product);
+        setUsuario(_product);
     };
 
     const leftToolbarTemplate = () => {
@@ -212,7 +207,7 @@ export default function PageRoles() {
         return (
             <>
                 <span className="p-column-title">No.</span>
-                {rowData.code}
+                {rowData.id}
             </>
         );
     };
@@ -220,56 +215,56 @@ export default function PageRoles() {
     const nameBodyTemplate = (rowData: Demo.Product) => {
         return (
             <>
+                <span className="p-column-title">Nombres</span>
+                {rowData.first_name}
+            </>
+        );
+    };
+
+    const lastNameBodyTemplate = (rowData: Demo.Product) => {
+        return (
+            <>
+                <span className="p-column-title">Apellidos</span>
+                {rowData.last_name}
+            </>
+        );
+    };
+
+    const rolBodyTemplate = (rowData: Demo.Product) => {
+        return (
+            <>
                 <span className="p-column-title">Rol</span>
-                {rowData.name}
+                {rowData.role.name}
             </>
         );
     };
 
-    const imageBodyTemplate = (rowData: Demo.Product) => {
+    const emailBodyTemplate = (rowData: Demo.Product) => {
         return (
             <>
-                <span className="p-column-title">Image</span>
-                <img src={`/demo/images/product/${rowData.image}`} alt={rowData.image} className="shadow-2" width="100" />
+                <span className="p-column-title">Rol</span>
+                {rowData.email}
             </>
         );
     };
 
-    const priceBodyTemplate = (rowData: Demo.Product) => {
+    const phoneNumberBodyTemplate = (rowData: Demo.Product) => {
         return (
             <>
-                <span className="p-column-title">Price</span>
-                {formatCurrency(rowData.price as number)}
+                <span className="p-column-title">Numero Telefono</span>
+                {rowData.phone_number}
             </>
         );
     };
 
-    const categoryBodyTemplate = (rowData: Demo.Product) => {
-        return (
-            <>
-                <span className="p-column-title">Category</span>
-                {rowData.category}
-            </>
-        );
-    };
-
-    const ratingBodyTemplate = (rowData: Demo.Product) => {
-        return (
-            <>
-                <span className="p-column-title">Reviews</span>
-                <Rating value={rowData.rating} readOnly cancel={false} />
-            </>
-        );
-    };
-
-    const statusBodyTemplate = (rowData: Demo.Product) => {
-        return (
-            <>
-                <span className="p-column-title">Status</span>
-                <span className={`product-badge status-${rowData.inventoryStatus?.toLowerCase()}`}>{rowData.inventoryStatus}</span>
-            </>
-        );
-    };
+    // const statusBodyTemplate = (rowData: Demo.Product) => {
+    //     return (
+    //         <>
+    //             <span className="p-column-title">Status</span>
+    //             <span className={`usuario-badge status-${rowData.inventoryStatus?.toLowerCase()}`}>{rowData.inventoryStatus}</span>
+    //         </>
+    //     );
+    // };
 
     const actionBodyTemplate = (rowData: Demo.Product) => {
         return (
@@ -321,7 +316,7 @@ export default function PageRoles() {
 
                     <DataTable
                         ref={dt}
-                        value={products}
+                        value={usuarios}
                         selection={selectedProducts}
                         onSelectionChange={(e) => setSelectedProducts(e.value)}
                         dataKey="id"
@@ -330,83 +325,125 @@ export default function PageRoles() {
                         rowsPerPageOptions={[5, 10, 25]}
                         className="datatable-responsive"
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} usuarios"
                         globalFilter={globalFilter}
                         emptyMessage="No se encontro ningun registro"
                         header={header}
                     >
                         <Column selectionMode="multiple" headerStyle={{ width: '4rem' }}></Column>
-                        <Column field="code" header="Id" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="name" header="Rol" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column header="Image" body={imageBodyTemplate}></Column>
-                        <Column field="price" header="Price" body={priceBodyTemplate} sortable></Column>
-                        <Column field="category" header="Category" sortable body={categoryBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="rating" header="Reviews" body={ratingBodyTemplate} sortable></Column>
-                        <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="id" header="Id" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="first_name" header="Nombre" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="last_name" header="Apellidos" sortable body={lastNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="rol" header="Rol" sortable body={rolBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="email" header="Correo" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="phone_number" header="Numero Telefono" body={phoneNumberBodyTemplate} sortable></Column>
+                        {/* <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable headerStyle={{ minWidth: '10rem' }}></Column> */}
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 
-                    <Dialog visible={productDialog} style={{ width: '450px' }} header="Product Details" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
-                        {product.image && <img src={`/demo/images/product/${product.image}`} alt={product.image} width="150" className="mt-0 mx-auto mb-5 block shadow-2" />}
-                        <div className="field">
-                            <label htmlFor="name">Nombre</label>
-                            <InputText
-                                id="name"
-                                value={product.name}
-                                onChange={(e) => onInputChange(e, 'name')}
-                                required
-                                autoFocus
-                                className={classNames({
-                                    'p-invalid': submitted && !product.name
-                                })}
-                            />
-                            {submitted && !product.name && <small className="p-invalid">Name is required.</small>}
-                        </div>
-                        <div className="field">
-                            <label htmlFor="description">Description</label>
-                            <InputTextarea id="description" value={product.description} onChange={(e) => onInputChange(e, 'description')} required rows={3} cols={20} />
-                        </div>
+                    <Dialog visible={productDialog} style={{ width: '450px' }} header="Usuario" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+                        <form action="PUT">
+                            <div className="field">
+                                <label htmlFor="first_name">Nombre</label>
+                                <InputText
+                                    id="first_name"
+                                    value={usuario.first_name}
+                                    // onChange={(e) => onInputChange(e, 'first_name')}
+                                    required
+                                    autoFocus
+                                    className={classNames({
+                                        'p-invalid': submitted && !usuario.first_name
+                                    })}
+                                    {...register('first_name')}
+                                />
+                                {submitted && !usuario.first_name && <small className="p-invalid">Este campo es requerido</small>}
+                            </div>
 
-                        <div className="field">
-                            <label className="mb-3">Category</label>
-                            <div className="formgrid grid">
-                                <div className="field-radiobutton col-6">
-                                    <RadioButton inputId="category1" name="category" value="Accessories" onChange={onCategoryChange} checked={product.category === 'Accessories'} />
-                                    <label htmlFor="category1">Accessories</label>
-                                </div>
-                                <div className="field-radiobutton col-6">
-                                    <RadioButton inputId="category2" name="category" value="Clothing" onChange={onCategoryChange} checked={product.category === 'Clothing'} />
-                                    <label htmlFor="category2">Clothing</label>
-                                </div>
-                                <div className="field-radiobutton col-6">
-                                    <RadioButton inputId="category3" name="category" value="Electronics" onChange={onCategoryChange} checked={product.category === 'Electronics'} />
-                                    <label htmlFor="category3">Electronics</label>
-                                </div>
-                                <div className="field-radiobutton col-6">
-                                    <RadioButton inputId="category4" name="category" value="Fitness" onChange={onCategoryChange} checked={product.category === 'Fitness'} />
-                                    <label htmlFor="category4">Fitness</label>
-                                </div>
+                            <div className="field">
+                                <label htmlFor="last_name">Apellido</label>
+                                <InputText
+                                    id="last_name"
+                                    value={usuario.last_name}
+                                    onChange={(e) => onInputChange(e, 'last_name')}
+                                    required
+                                    autoFocus
+                                    className={classNames({
+                                        'p-invalid': submitted && !usuario.last_name
+                                    })}
+                                />
+                                {submitted && !usuario.last_name && <small className="p-invalid">Este campo es requerido</small>}
                             </div>
-                        </div>
+                            <div className="field">
+                                <label htmlFor="phone_number">Telefono</label>
+                                <InputText
+                                    id="phone_number"
+                                    value={usuario.phone_number}
+                                    onChange={(e) => onInputChange(e, 'phone_number')}
+                                    required
+                                    autoFocus
+                                    className={classNames({
+                                        'p-invalid': submitted && !usuario.phone_number
+                                    })}
+                                />
+                                {submitted && !usuario.phone_number && <small className="p-invalid">Este campo es requerido</small>}
+                            </div>
 
-                        <div className="formgrid grid">
-                            <div className="field col">
-                                <label htmlFor="price">Price</label>
-                                <InputNumber id="price" value={product.price} onValueChange={(e) => onInputNumberChange(e, 'price')} mode="currency" currency="USD" locale="en-US" />
+                            <div className="field">
+                                <label htmlFor="email">Correo</label>
+                                <InputText
+                                    id="email"
+                                    value={usuario.email}
+                                    onChange={(e) => onInputChange(e, 'email')}
+                                    required
+                                    autoFocus
+                                    className={classNames({
+                                        'p-invalid': submitted && !usuario.email
+                                    })}
+                                />
+                                {submitted && !usuario.email && <small className="p-invalid">Este campo es requerido</small>}
                             </div>
-                            <div className="field col">
-                                <label htmlFor="quantity">Quantity</label>
-                                <InputNumber id="quantity" value={product.quantity} onValueChange={(e) => onInputNumberChange(e, 'quantity')} />
+
+                            <div className="field">
+                                <label htmlFor="email">Correo</label>
+                                <InputText
+                                    id="email"
+                                    value={usuario.email}
+                                    onChange={(e) => onInputChange(e, 'email')}
+                                    required
+                                    autoFocus
+                                    className={classNames({
+                                        'p-invalid': submitted && !usuario.email
+                                    })}
+                                />
+                                {submitted && !usuario.email && <small className="p-invalid">Este campo es requerido</small>}
                             </div>
-                        </div>
+
+                            <div className="field">
+                                <label htmlFor="rol">Rol</label>
+                                <Dropdown
+                                    id="rol"
+                                    value={usuario.role}
+                                    onChange={(e) => onInputChange(e.value, 'role')}
+                                    options={[usuario.role]}
+                                    optionLabel="name"
+                                    placeholder="Seleccione un Rol"
+                                    checkmark={true}
+                                    highlightOnSelect={false}
+                                    className={classNames({
+                                        'p-invalid': submitted && !usuario.email
+                                    })}
+                                />
+                                {submitted && !usuario.email && <small className="p-invalid">Este campo es requerido</small>}
+                            </div>
+                        </form>
                     </Dialog>
 
                     <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {product && (
+                            {usuario && (
                                 <span>
-                                    ¿Está seguro de eliminar el rol <b>{product.name}</b>?
+                                    ¿Está seguro de eliminar el rol <b>{usuario.name}</b>?
                                 </span>
                             )}
                         </div>
@@ -415,7 +452,7 @@ export default function PageRoles() {
                     <Dialog visible={deleteProductsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {product && <span>Are you sure you want to delete the selected products?</span>}
+                            {usuario && <span>Are you sure you want to delete the selected usuarios?</span>}
                         </div>
                     </Dialog>
                 </div>

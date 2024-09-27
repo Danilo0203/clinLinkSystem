@@ -44,7 +44,7 @@ const Dashboard = () => {
     const [lineOptions, setLineOptions] = useState<ChartOptions>({});
     const { layoutConfig } = useContext(LayoutContext);
     const { data: session, status } = useSession();
-    const [toastShown, setToastShown] = useState(false);
+    const [toastShown, setToastShown] = useState(true);
 
     const applyLightTheme = () => {
         const lineOptions: ChartOptions = {
@@ -134,11 +134,11 @@ const Dashboard = () => {
             toast.current?.show({
                 severity: 'success',
                 summary: 'Inicio de Sesión Exitoso',
-                detail: `El usuario ${session?.user?.name} inició sesión correctamente`
+                detail: `El usuario ${session?.user?.user_data?.first_name} inició sesión correctamente`
             });
-            setToastShown(true);
+            setToastShown(!toastShown);
         }
-    }, [toastShown]);
+    }, []);
 
     return (
         <Layout>

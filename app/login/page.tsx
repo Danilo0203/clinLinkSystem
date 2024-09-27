@@ -7,12 +7,14 @@ import { Button } from 'primereact/button';
 import { FloatLabel } from 'primereact/floatlabel';
 import { InputText } from 'primereact/inputtext';
 import { Password } from 'primereact/password';
-import React from 'react';
+import { Toast } from 'primereact/toast';
+import React, { useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 
 const LogingPage = () => {
     const router = useRouter();
     const { register, handleSubmit, control } = useForm();
+    const toast = useRef(null);
     const onSubmit = async (data: any) => {
         try {
             const res = await signIn('credentials', {
@@ -21,15 +23,22 @@ const LogingPage = () => {
                 password_confirmation: data.password_confirmation,
                 redirect: false
             });
+
+            if (res?.ok === false) {
+                toast.current.show({ severity: 'error', summary: 'Error al iniciar sesión', detail: res.error });
+                return;
+            }
             if (res?.ok) return router.push('/dashboard');
         } catch (error) {
             if (error instanceof AxiosError) {
+                toast.current.show({ severity: 'error', summary: 'Error al iniciar sesión', detail: error });
                 console.error(error.response?.data);
             }
         }
     };
     return (
         <div className="min-h-screen text-center py-5">
+            <Toast ref={toast} />
             <h2>Formulario de Inicio de sesión</h2>
             <form onSubmit={handleSubmit(onSubmit)} className="flex align-items-center justify-content-center">
                 <div className="flex flex-column gap-5 py-2">

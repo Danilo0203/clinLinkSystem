@@ -1,6 +1,7 @@
 import api from '@/libs/utils';
 import { AxiosError } from 'axios';
 import NextAuth from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
 
 declare module 'next-auth' {
     interface Session {
@@ -8,7 +9,6 @@ declare module 'next-auth' {
         user?: string;
     }
 }
-import CredentialsProvider from 'next-auth/providers/credentials';
 
 const handler = NextAuth({
     providers: [
@@ -26,10 +26,8 @@ const handler = NextAuth({
                         password: credentials?.password,
                         password_confirmation: credentials?.password_confirmation
                     });
-
                     // Aquí recibes el token del backend
                     const { success, data, token, message } = res.data;
-
                     // Verifica si el login fue exitoso
                     if (success) {
                         // Devolver el token como "user", puedes devolver otros datos si lo deseas

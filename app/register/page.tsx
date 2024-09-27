@@ -1,6 +1,7 @@
 'use client';
 import { RegistroService } from '@/libs/endpoints/registro/registroApi';
 import { AxiosError } from 'axios';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { addLocale } from 'primereact/api';
 import { Button } from 'primereact/button';
@@ -75,38 +76,12 @@ const Page = () => {
                     </FloatLabel>
 
                     <FloatLabel>
-                        <Controller
-                            name="password"
-                            control={control}
-                            defaultValue=""
-                            render={({ field }) => (
-                                <Password
-                                    {...field}
-                                    inputId="password"
-                                    feedback={false}
-                                    toggleMask
-                                    type="password" // Cambiado a "password" para mayor seguridad
-                                />
-                            )}
-                        />
+                        <Controller name="password" control={control} defaultValue="" render={({ field }) => <Password {...field} inputId="password" feedback={false} toggleMask type="password" />} />
                         <label htmlFor="password">Contraseña</label>
                     </FloatLabel>
 
                     <FloatLabel>
-                        <Controller
-                            name="password_confirmation"
-                            control={control}
-                            defaultValue=""
-                            render={({ field }) => (
-                                <Password
-                                    {...field}
-                                    inputId="password_confirmation"
-                                    feedback={false}
-                                    toggleMask
-                                    type="password" // Cambiado a "password" para mayor seguridad
-                                />
-                            )}
-                        />
+                        <Controller name="password_confirmation" control={control} defaultValue="" render={({ field }) => <Password {...field} inputId="password_confirmation" feedback={false} toggleMask type="password" />} />
                         <label htmlFor="password_confirmation">Confirmar Contraseña</label>
                     </FloatLabel>
 
@@ -121,6 +96,10 @@ const Page = () => {
                     </FloatLabel>
 
                     <Button label="Registrarse" type="submit" className="p-button-raised p-button-rounded p-button-primary" />
+                    <div className="flex flex-column gap-1">
+                        <p className="m-0">¿Ya tienes una cuenta?</p>
+                        <Link href="/login">Iniciar sesión</Link>
+                    </div>
                 </div>
             </form>
         </div>
