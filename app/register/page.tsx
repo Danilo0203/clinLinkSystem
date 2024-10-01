@@ -1,31 +1,43 @@
 'use client';
-import { useRouter } from 'next/navigation';
 import React, { FormEvent, useContext, useState } from 'react';
-import { Checkbox } from 'primereact/checkbox';
+
 import { Button } from 'primereact/button';
 import { Password } from 'primereact/password';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
 import { LayoutContext } from '@/layout/context/layoutcontext';
-import axios from 'axios';
+import api from '@/libs/utils';
+import { signIn } from 'next-auth/react';
+
 const Registerpage = () => {
-    const [password, setPassword] = useState('');
-    const [checked, setChecked] = useState(false);
+    const [password, setPassword] = useState('Danilo.023');
+    const [confirmPassword, setConfirmPassword] = useState('Danilo.023');
     const { layoutConfig } = useContext(LayoutContext);
-    const router = useRouter();
+
     const containerClassName = classNames('surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden', { 'p-input-filled': layoutConfig.inputStyle === 'filled' });
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
-        axios
-            .post('/api/register', { email: formData.get('email1'), password })
-            .then((res) => {
-                console.log(res.data);
-                router.push('/dashboard');
-            })
-            .catch((err) => {
-                console.log(err.response.data);
+
+        try {
+            const res = await api.post('/api/register', {
+                username: formData.get('username'),
+                first_name: formData.get('first_name'),
+                last_name: formData.get('last_name'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                password_confirmation: formData.get('password_confirmation'),
+                phone_number: formData.get('phone_number'),
+                date_of_birth: '1999-12-12'
             });
+            signIn("credentials", {
+                email: res.data.email,
+            })
+            console.log(res);
+        } catch (error) {
+            console.log(error);
+        }
     };
     return (
         <div className={containerClassName}>
@@ -40,32 +52,56 @@ const Registerpage = () => {
                 >
                     <div className="w-full surface-card py-8 px-5 sm:px-8" style={{ borderRadius: '53px' }}>
                         <div className="text-center mb-5">
-                            <img src="/demo/images/login/avatar.png" alt="Image" height="50" className="mb-3" />
-                            <div className="text-900 text-3xl font-medium mb-3">Welcome, Isabel!</div>
+                            <img src="/layout/images/Logo.png" alt="Image" height="50" className="mb-3" />
+                            {/* <div className="text-900 text-3xl font-medium mb-3">Welcome, Isabel!</div> */}
                             <span className="text-600 font-medium">Sign in to continue</span>
                         </div>
 
                         <form onSubmit={handleSubmit}>
-                            <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
-                                Email
+                            <label htmlFor="username" className="block text-900 text-xl font-medium mb-2">
+                                Usuario
                             </label>
-                            <InputText id="email1" type="text" placeholder="Email address" className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }} name="email1" />
+                            <InputText id="username" type="text" placeholder="Usuario" className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }} name="username" value="dCalderonPrueba" />
 
-                            <label htmlFor="password1" className="block text-900 font-medium text-xl mb-2">
-                                Password
+                            <label htmlFor="first_name" className="block text-900 font-medium text-xl mb-2">
+                                Nombres
                             </label>
-                            <Password name="password1" inputId="password1" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" toggleMask className="w-full mb-5" inputClassName="w-full p-3 md:w-30rem"></Password>
+                            <InputText name="first_name" id="first_name" placeholder="Nombres" className="w-full mb-5" value="Danilo"></InputText>
 
-                            <div className="flex align-items-center justify-content-between mb-5 gap-5">
-                                <div className="flex align-items-center">
-                                    <Checkbox inputId="rememberme1" checked={checked} onChange={(e) => setChecked(e.checked ?? false)} className="mr-2"></Checkbox>
-                                    <label htmlFor="rememberme1">Remember me</label>
-                                </div>
-                                <a className="font-medium no-underline ml-2 text-right cursor-pointer" style={{ color: 'var(--primary-color)' }}>
-                                    Forgot password?
-                                </a>
-                            </div>
-                            <Button label="Sign In" className="w-full p-3 text-xl" type="submit"></Button>
+                            <label htmlFor="first_name" className="block text-900 font-medium text-xl mb-2">
+                                Apellidos
+                            </label>
+                            <InputText name="last_name" id="last_name" placeholder="Apellidos" className="w-full mb-5" value="Calderon"></InputText>
+
+                            <label htmlFor="first_name" className="block text-900 font-medium text-xl mb-2">
+                                Correo
+                            </label>
+                            <InputText name="email" id="email" placeholder="Correo" className="w-full mb-5" value="email@email.com"></InputText>
+
+                            <label htmlFor="first_name" className="block text-900 font-medium text-xl mb-2">
+                                Contraseña
+                            </label>
+                            <Password name="password" id="password" placeholder="Contraseña" className="w-full mb-5" toggleMask value={password} onChange={(e) => setPassword(e.target.value)}></Password>
+
+                            <label htmlFor="first_name" className="block text-900 font-medium text-xl mb-2">
+                                Confirmar Contraseña
+                            </label>
+                            <Password
+                                name="password_confirmation"
+                                id="password_confirmation"
+                                placeholder="Confrimar Contraseña"
+                                className="w-full mb-5"
+                                toggleMask
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                            ></Password>
+
+                            <label htmlFor="first_name" className="block text-900 font-medium text-xl mb-2">
+                                Numero de Telefono
+                            </label>
+                            <InputText name="phone_number" id="phone_number" placeholder="Numero de telefono" className="w-full mb-5" value="12345678"></InputText>
+
+                            <Button label="Sign Up" className="w-full p-3 text-xl" type="submit"></Button>
                         </form>
                     </div>
                 </div>
