@@ -12,8 +12,9 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
-import { ProductService } from '../../../../demo/service/ProductService';
+// import { ProductService } from '../../../../demo/service/ProductService';
 import { Demo } from '@/types';
+import { RolesService } from '@/libs/endpoints/usuarios/usuariosApi';
 
 export default function PageRoles() {
     let emptyProduct: Demo.Product = {
@@ -40,15 +41,18 @@ export default function PageRoles() {
     const dt = useRef<DataTable<any>>(null);
 
     useEffect(() => {
-        ProductService.getProducts().then((data) => setProducts(data as any));
+        RolesService.getListarRoles().then((data) => setProducts(data.data as any));
+        // ProductService.getProducts().then((data) => setProducts(data as any));
     }, []);
 
-    const formatCurrency = (value: number) => {
-        return value.toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD'
-        });
-    };
+    console.log(products);
+
+    // const formatCurrency = (value: number) => {
+    //     return value.toLocaleString('en-US', {
+    //         style: 'currency',
+    //         currency: 'USD'
+    //     });
+    // };
 
     const openNew = () => {
         setProduct(emptyProduct);
@@ -212,7 +216,7 @@ export default function PageRoles() {
         return (
             <>
                 <span className="p-column-title">No.</span>
-                {rowData.code}
+                {rowData.id}
             </>
         );
     };
@@ -235,14 +239,14 @@ export default function PageRoles() {
         );
     };
 
-    const priceBodyTemplate = (rowData: Demo.Product) => {
-        return (
-            <>
-                <span className="p-column-title">Price</span>
-                {formatCurrency(rowData.price as number)}
-            </>
-        );
-    };
+    // const priceBodyTemplate = (rowData: Demo.Product) => {
+    //     return (
+    //         <>
+    //             <span className="p-column-title">Price</span>
+    //             {formatCurrency(rowData.price as number)}
+    //         </>
+    //     );
+    // };
 
     const categoryBodyTemplate = (rowData: Demo.Product) => {
         return (
@@ -336,10 +340,10 @@ export default function PageRoles() {
                         header={header}
                     >
                         <Column selectionMode="multiple" headerStyle={{ width: '4rem' }}></Column>
-                        <Column field="code" header="Id" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="id" header="Id" sortable body={codeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="name" header="Rol" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column header="Image" body={imageBodyTemplate}></Column>
-                        <Column field="price" header="Price" body={priceBodyTemplate} sortable></Column>
+                        {/* <Column field="price" header="Price" body={priceBodyTemplate} sortable></Column> */}
                         <Column field="category" header="Category" sortable body={categoryBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="rating" header="Reviews" body={ratingBodyTemplate} sortable></Column>
                         <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable headerStyle={{ minWidth: '10rem' }}></Column>

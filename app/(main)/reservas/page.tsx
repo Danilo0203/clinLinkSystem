@@ -7,12 +7,11 @@ import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import React, { useEffect, useRef, useState } from 'react';
-import 'react-datepicker/dist/react-datepicker.css';
+// import 'react-datepicker/dist/react-datepicker.css';
 import AppointmentTable from '../reservas/components/AppointmentTable';
 import { Calendar } from 'primereact/calendar';
 import { Nullable } from 'primereact/ts-helpers';
 export default function PageReservas() {
-
     interface Appointment {
         id: number;
         room_id: number | null;
@@ -26,7 +25,7 @@ export default function PageReservas() {
 
     const [appointments, setAppointments] = useState<Appointment[]>([
         { id: 1, room_id: 101, appointment_status_id: 1, patient_id: 201, doctor_id: 301, appointment_date: '2024-09-26', start_timestamp: '09:00', end_timestamp: '10:00' },
-        { id: 2, room_id: 102, appointment_status_id: 2, patient_id: 202, doctor_id: 302, appointment_date: '2024-09-27', start_timestamp: '10:00', end_timestamp: '11:00' },
+        { id: 2, room_id: 102, appointment_status_id: 2, patient_id: 202, doctor_id: 302, appointment_date: '2024-09-27', start_timestamp: '10:00', end_timestamp: '11:00' }
     ]);
 
     const [newAppointmentDialog, setNewAppointmentDialog] = useState(false);
@@ -34,8 +33,7 @@ export default function PageReservas() {
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
 
-    useEffect(() => {
-    }, []);
+    useEffect(() => {}, []);
 
     const openNew = () => {
         setAppointment({
@@ -46,16 +44,12 @@ export default function PageReservas() {
             doctor_id: 0,
             appointment_date: '',
             start_timestamp: '',
-            end_timestamp: '',
+            end_timestamp: ''
         });
         setNewAppointmentDialog(true);
     };
     const isAppointmentConflict = (newAppointment: Appointment, appointments: Appointment[]): boolean => {
-        return appointments.some(appointment =>
-            appointment.doctor_id === newAppointment.doctor_id &&
-            appointment.appointment_date === newAppointment.appointment_date &&
-            appointment.start_timestamp === newAppointment.start_timestamp
-        );
+        return appointments.some((appointment) => appointment.doctor_id === newAppointment.doctor_id && appointment.appointment_date === newAppointment.appointment_date && appointment.start_timestamp === newAppointment.start_timestamp);
     };
     const saveNewAppointment = (newAppointment: Appointment) => {
         if (isAppointmentConflict(newAppointment, appointments)) {
@@ -63,7 +57,7 @@ export default function PageReservas() {
                 severity: 'error',
                 summary: 'Error',
                 detail: 'There is already an appointment with this doctor at the same time.',
-                life: 3000,
+                life: 3000
             });
             return;
         }
@@ -75,7 +69,7 @@ export default function PageReservas() {
             severity: 'success',
             summary: 'Successful',
             detail: 'Appointment Created',
-            life: 3000,
+            life: 3000
         });
     };
     const newAppointmentDialogFooter = (
@@ -118,7 +112,8 @@ export default function PageReservas() {
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 {/*                 <InputText type="search" onInput={(e) => setGlobalFilter(e.currentTarget.value)} placeholder="Buscar..." />
- */}            </span>
+                 */}{' '}
+            </span>
         </div>
     );
     return (
@@ -152,23 +147,21 @@ export default function PageReservas() {
                                     </div>
                                     <div className="field">
                                         <label htmlFor="appointment_date">Fecha de Citas</label>
-                                        <InputText type='date' id="appointment_date" value={appointment.appointment_date} onChange={(e) => setAppointment({ ...appointment, appointment_date: e.target.value })} required />
+                                        <InputText type="date" id="appointment_date" value={appointment.appointment_date} onChange={(e) => setAppointment({ ...appointment, appointment_date: e.target.value })} required />
                                     </div>
                                     <div className="field">
                                         <label htmlFor="start_timestamp">Hora de Inicio</label>
-                                        <InputText type='time' id="start_timestamp" value={appointment.start_timestamp} onChange={(e) => setAppointment({ ...appointment, start_timestamp: e.target.value })} required />
+                                        <InputText type="time" id="start_timestamp" value={appointment.start_timestamp} onChange={(e) => setAppointment({ ...appointment, start_timestamp: e.target.value })} required />
                                     </div>
                                     <div className="field">
                                         <label htmlFor="end_timestamp">Hora Final</label>
-                                        <InputText type='time' id="end_timestamp" value={appointment.end_timestamp} onChange={(e) => setAppointment({ ...appointment, end_timestamp: e.target.value })} required />
+                                        <InputText type="time" id="end_timestamp" value={appointment.end_timestamp} onChange={(e) => setAppointment({ ...appointment, end_timestamp: e.target.value })} required />
                                     </div>
                                 </>
                             )}
                         </Dialog>
                     </div>
                 </div>
-
-
             </div>
         </div>
     );
