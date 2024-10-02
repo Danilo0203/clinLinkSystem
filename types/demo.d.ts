@@ -47,9 +47,6 @@ export interface Datum {
 export interface Role {
     id: number;
     name: string;
-    deleted_at: null;
-    created_at: Date;
-    updated_at: Date;
 }
 
 export interface Link {
@@ -68,4 +65,20 @@ export interface UsuarioProp {
     password_confirmation: string;
     phone_number: string;
     date_of_birth: string;
+    role: Role;
+}
+export interface HorariosProps {
+    success: boolean;
+    data: DataHorarios;
+    message: string;
+}
+
+export interface DataHorarios {
+    id: number | null;
+    doctor_id: number | null;
+    day_of_week: number | null;
+    time_start: Date | string;
+    time_end: Date | string;
+    doctor?: string;
+    day?: string;
 }
