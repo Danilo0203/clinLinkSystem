@@ -6,15 +6,15 @@ import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { UsuariosService } from '@/libs/endpoints/usuarios/usuariosApi';
 import { Dropdown } from 'primereact/dropdown';
 import { Controller, useForm } from 'react-hook-form';
+import { AxiosError } from 'axios';
 import { Datum, UsuarioProp } from '@/types/demo';
-import { useCrud } from '@/app/hooks/useCrudTable';
 
 export default function PageUsuarios() {
-    let emptyUser = {
+    let emptyProduct = {
         id: null,
         first_name: '',
         last_name: '',
@@ -27,66 +27,138 @@ export default function PageUsuarios() {
         date_of_birth: ''
     };
 
-    const { register, control, handleSubmit, setValue, reset } = useForm();
-
+    const [usuarios, setUsuarios] = useState([]);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [userDialog, setUserDialog] = useState(false);
+    const [deleteProductDialog, setDeleteProductDialog] = useState(false);
+    const [usuario, setUsuario] = useState(emptyProduct);
+    const [globalFilter, setGlobalFilter] = useState('');
+    const { register, handleSubmit, setValue, control, reset } = useForm<UsuarioProp>();
+    const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
 
-    // const [globalFilter, setGlobalFilter] = useState('');
+    const [first, setFirst] = useState(0);
+    const [rows, setRows] = useState(10);
 
-    const {
-        record: usuario,
-        data,
-        isLoading,
-        dialogVisible,
-        deleteDialogVisible,
-        openNew,
-        confirmDeleteRecord,
-        saveRecord,
-        deleteRecord,
-        hideDeleteDialog,
-        lazyState,
-        setLazyState,
-        setRecord,
-        setDialogVisible,
-        toast
-    } = useCrud({
-        service: UsuariosService,
-        emptyRecord: emptyUser,
-        queryKey: 'usuarios'
-    });
+    useEffect(() => {
+        loadUsers();
+    }, []);
 
-    const onPage = (event: { first: number; rows: number; page?: number }) => {
-        setLazyState((prevState) => ({
-            ...prevState,
-            first: event.first,
-            rows: event.rows,
-            page: (event.page ?? 0) + 1
-        }));
+    const loadUsers = async () => {
+        setLoading(true);
+        try {
+            const data = await UsuariosService.getListarUsuarios();
+            setUsuarios(data.data);
+            setTotalRecords(data.data.length);
+        } catch (error) {
+            console.error('Error al cargar los usuarios:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    // Editar un registro
-    const editRecord = (record: any) => {
-        setRecord(record);
-        Object.keys(record).forEach((field) => {
-            setValue(field, record[field]);
-        });
-
-        setDialogVisible(true);
+    const onPage = (event: { first: React.SetStateAction<number>; rows: React.SetStateAction<number> }) => {
+        setFirst(event.first);
+        setRows(event.rows);
     };
 
-    // Cerrar los diálogos
+    const openNew = () => {
+        setUsuario(emptyProduct);
+        reset(emptyProduct);
+        setUserDialog(true);
+    };
+
     const hideDialog = () => {
-        reset(emptyUser);
-        setDialogVisible(false);
+        setUserDialog(false);
     };
 
-    // const onSort = (event: { sortField: any; sortOrder: any }) => {
-    //     setLazyState((prevState) => ({
-    //         ...prevState,
-    //         sortField: event.sortField,
-    //         sortOrder: event.sortOrder
-    //     }));
-    // };
+    const hideDeleteProductDialog = () => {
+        setDeleteProductDialog(false);
+    };
+
+    const saveProduct = async (data: UsuarioProp) => {
+        if (usuario.id) {
+            try {
+                await UsuariosService.putActualizar(usuario.id, data);
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Usuario Actualizado',
+                    detail: 'El usuario ha sido actualizado',
+                    life: 3000
+                });
+            } catch (error) {
+                if (error instanceof AxiosError) {
+                    console.log(error.response);
+                    toast.current?.show({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: `Error al actualizar el usuario: ${error.response?.data.message}`,
+                        life: 3000
+                    });
+                }
+            }
+        } else {
+            try {
+                await UsuariosService.postCrear(data);
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Usuario Creado',
+                    detail: 'El usuario ha sido creado exitosamente',
+                    life: 3000
+                });
+            } catch (error) {
+                if (error instanceof AxiosError) {
+                    console.log(error.response);
+                    toast.current?.show({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: `Error al crear el usuario: ${error.response?.data.message}`,
+                        life: 3000
+                    });
+                }
+            }
+        }
+
+        await loadUsers();
+        setUserDialog(false);
+    };
+
+    const editProduct = (usuario: UsuarioProp) => {
+        setUsuario(usuario);
+        (Object.keys(usuario) as (keyof UsuarioProp)[]).forEach((field) => setValue(field, usuario[field]));
+        setUserDialog(true);
+    };
+
+    const confirmDeleteProduct = (usuario: UsuarioProp) => {
+        setUsuario(usuario);
+        setDeleteProductDialog(true);
+    };
+
+    const deleteProduct = async () => {
+        try {
+            await UsuariosService.deleteEliminar(usuario.id);
+            await loadUsers();
+            setDeleteProductDialog(false);
+            setUsuario(emptyProduct);
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Usuario Eliminado',
+                detail: 'El usuario ha sido eliminado correctamente',
+                life: 3000
+            });
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                console.log(error.response);
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: `Error al eliminar el usuario: ${error.response?.data.message}`,
+                    life: 3000
+                });
+            }
+        }
+    };
 
     const exportCSV = () => {
         dt.current?.exportCSV();
@@ -104,11 +176,11 @@ export default function PageUsuarios() {
         return <Button label="Exportar" icon="pi pi-upload" severity="help" onClick={exportCSV} />;
     };
 
-    const codeBodyTemplate = (rowData: UsuarioProp, { rowIndex }: { rowIndex: number }) => {
+    const codeBodyTemplate = (rowdata: any, { rowIndex }: { rowIndex: number }) => {
         return (
             <>
                 <span className="p-column-title">No.</span>
-                {rowIndex + 1} {/* Correlativo basado en el índice de fila más la posición de la paginación */}
+                {rowIndex + 1}
             </>
         );
     };
@@ -152,7 +224,7 @@ export default function PageUsuarios() {
     const phoneNumberBodyTemplate = (rowData: UsuarioProp) => {
         return (
             <>
-                <span className="p-column-title">Numero Telefono</span>
+                <span className="p-column-title">Número Teléfono</span>
                 {rowData.phone_number}
             </>
         );
@@ -161,29 +233,33 @@ export default function PageUsuarios() {
     const actionBodyTemplate = (rowData: UsuarioProp) => {
         return (
             <>
-                <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editRecord(rowData)} />
-                <Button icon="pi pi-trash" rounded severity="warning" onClick={() => confirmDeleteRecord(rowData)} />
+                <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editProduct(rowData)} />
+                <Button icon="pi pi-trash" rounded severity="warning" onClick={() => confirmDeleteProduct(rowData)} />
             </>
         );
     };
 
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">Tabla de Roles</h5>
+            <h5 className="m-0">Tabla de Usuarios</h5>
+            <span className="block mt-2 md:mt-0 p-input-icon-left">
+                <i className="pi pi-search" />
+                <InputText type="search" value={globalFilter} onChange={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar..." />
+            </span>
         </div>
     );
 
     const productDialogFooter = (
         <>
             <Button label="Cancelar" icon="pi pi-times" text onClick={hideDialog} />
-            <Button label="Guardar" icon="pi pi-check" text onClick={handleSubmit(saveRecord)} />
+            <Button label="Guardar" icon="pi pi-check" text onClick={handleSubmit(saveProduct)} />
         </>
     );
 
-    const deleteUserDialogFooter = (
+    const deleteProductDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" text onClick={hideDeleteDialog} />
-            <Button label="Sí" icon="pi pi-check" text onClick={deleteRecord} />
+            <Button label="No" icon="pi pi-times" text onClick={hideDeleteProductDialog} />
+            <Button label="Sí" icon="pi pi-check" text onClick={deleteProduct} />
         </>
     );
 
@@ -193,37 +269,33 @@ export default function PageUsuarios() {
                 <div className="card">
                     <Toast ref={toast} />
                     <Toolbar className="mb-4" end={leftToolbarTemplate} start={rightToolbarTemplate}></Toolbar>
-
                     <DataTable
                         ref={dt}
-                        value={data?.data.data}
-                        lazy
-                        filterDisplay="row"
+                        value={usuarios}
                         paginator
-                        rows={lazyState.rows}
-                        totalRecords={data?.data.total || 0}
-                        first={lazyState.first}
+                        rows={rows}
+                        totalRecords={totalRecords}
+                        first={first}
                         onPage={onPage}
-                        // globalFilter={globalFilter}
-                        // onSort={onSort}
-                        // onFilter={onFilter}
-                        loading={isLoading}
+                        loading={loading}
                         className="datatable-responsive"
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
+                        globalFilter={globalFilter}
+                        globalFilterFields={['first_name', 'last_name', 'email', 'role.name']}
                         emptyMessage="No se encontraron registros"
                         header={header}
                     >
-                        <Column field="id" header="Id" body={codeBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="first_name" header="Nombre" body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="last_name" header="Apellidos" body={lastNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="rol" header="Rol" body={rolBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="email" header="Correo" body={emailBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="phone_number" header="Numero Telefono" body={phoneNumberBodyTemplate}></Column>
+                        <Column field="id" header="No." body={codeBodyTemplate} headerStyle={{ minWidth: '4rem' }}></Column>
+                        <Column field="first_name" header="Nombre" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="last_name" header="Apellidos" sortable body={lastNameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="role.name" header="Rol" sortable body={rolBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="email" header="Correo" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '20rem' }}></Column>
+                        <Column field="phone_number" header="Número Teléfono" body={phoneNumberBodyTemplate} sortable headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 
-                    <Dialog visible={dialogVisible} style={{ width: '450px' }} header="Usuario" modal className="p-fluid" onHide={hideDialog} footer={productDialogFooter}>
+                    <Dialog visible={userDialog} style={{ width: '450px' }} header="Usuario" modal className="p-fluid" onHide={hideDialog} footer={productDialogFooter}>
                         <form>
                             <div className="field">
                                 <label htmlFor="first_name">Nombre</label>
@@ -252,12 +324,12 @@ export default function PageUsuarios() {
 
                             <div className="field">
                                 <label htmlFor="password">Contraseña</label>
-                                <InputText id="password" {...register('password', { required: true })} type="password" />
+                                <InputText id="password" {...register('password')} type="password" />
                             </div>
 
                             <div className="field">
                                 <label htmlFor="password_confirmation">Confirmar Contraseña</label>
-                                <InputText id="password_confirmation" {...register('password_confirmation', { required: true })} type="password" />
+                                <InputText id="password_confirmation" {...register('password_confirmation')} type="password" />
                             </div>
 
                             <div className="field">
@@ -284,7 +356,6 @@ export default function PageUsuarios() {
                                                 { label: 'Cliente', value: 3 }
                                             ]}
                                             placeholder="Seleccione un Rol"
-                                            checkmark={true}
                                             className={fieldState.invalid ? 'p-invalid' : ''}
                                         />
                                     )}
@@ -293,7 +364,7 @@ export default function PageUsuarios() {
                         </form>
                     </Dialog>
 
-                    <Dialog visible={deleteDialogVisible} style={{ width: '450px' }} header="Confirmar" modal footer={deleteUserDialogFooter} onHide={hideDeleteDialog}>
+                    <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirmar" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {usuario && (
