@@ -82,3 +82,15 @@ export interface DataHorarios {
     doctor?: string;
     day?: string;
 }
+export interface DetallesDoctoresProps {
+    success: boolean;
+    data: Datum[];
+    message: string;
+}
+
+export interface DetalleDoctor {
+    id: number | null;
+    doctor_id: number | null;
+    license_number: number | null;
+    years_of_experience: number | null;
+}

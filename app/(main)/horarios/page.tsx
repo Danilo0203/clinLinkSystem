@@ -28,13 +28,13 @@ export default function PageHorarios() {
 
     const [doctors, setDoctors] = useState<{ id: number; first_name: string; last_name: string }[]>([]);
     const daysOfWeekOptions = [
-        { label: 'Lunes', value: 1 },
-        { label: 'Martes', value: 2 },
-        { label: 'Miércoles', value: 3 },
-        { label: 'Jueves', value: 4 },
-        { label: 'Viernes', value: 5 },
-        { label: 'Sábado', value: 6 },
-        { label: 'Domingo', value: 7 }
+        { label: 'Lunes', value: 2 },
+        { label: 'Martes', value: 3 },
+        { label: 'Miércoles', value: 4 },
+        { label: 'Jueves', value: 5 },
+        { label: 'Viernes', value: 6 },
+        { label: 'Sábado', value: 7 },
+        { label: 'Domingo', value: 8 }
     ];
 
     useEffect(() => {
