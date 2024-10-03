@@ -1,12 +1,16 @@
 import api from '@/libs/utils';
 import { AxiosError } from 'axios';
-import NextAuth from 'next-auth';
+import NextAuth, { User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
 declare module 'next-auth' {
     interface Session {
         accessToken?: string;
         user?: string;
+    }
+
+    interface User {
+        accessToken?: string;
     }
 }
 
@@ -57,8 +61,8 @@ const handler = NextAuth({
             return token;
         },
         session({ session, token }) {
-            session.accessToken = token.accessToken; // Asigna el accessToken a la sesión
-            session.user = token.user; // Mantén la estructura original de `user`
+            session.accessToken = token.accessToken as string | undefined; // Asigna el accessToken a la sesión
+            session.user = token.user as string | undefined; // Mantén la estructura original de `user`
             return session;
         }
     },
