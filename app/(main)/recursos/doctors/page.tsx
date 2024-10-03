@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 
-import { DetalleDoctor, DetalleDoctor } from '@/types/demo';
+import { DetalleDoctor } from '@/types/demo';
 import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -20,7 +20,8 @@ export default function PageDoctoresDetalle() {
         id: null,
         doctor_id: null,
         license_number: null,
-        years_of_experience: null
+        years_of_experience: null,
+        doctor: ''
     };
     const [doctors, setDoctors] = useState<{ id: number; first_name: string; last_name: string }[]>([]);
 
@@ -129,7 +130,7 @@ export default function PageDoctoresDetalle() {
                         <Column body={actionBodyTemplate}></Column>
                     </DataTable>
 
-                    <Dialog visible={dialogVisible} style={{ width: '450px' }} header="Usuario" modal className="p-fluid" footer={userDialogFooter} onHide={hideDialog}>
+                    <Dialog visible={dialogVisible} style={{ width: '450px' }} header="Detalle Doctor" modal className="p-fluid" footer={userDialogFooter} onHide={hideDialog}>
                         <form>
                             <div className="field">
                                 <label htmlFor="doctor_id">Doctor</label>
@@ -169,7 +170,7 @@ export default function PageDoctoresDetalle() {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {doctor && (
                                 <span>
-                                    ¿Está seguro de eliminar el doctor <b>{doctor.first_name + ' ' + doctor.last_name}</b>?
+                                    ¿Está seguro de eliminar el doctor <b>{doctor.doctor}</b>?
                                 </span>
                             )}
                         </div>

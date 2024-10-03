@@ -91,6 +91,17 @@ export interface DetallesDoctoresProps {
 export interface DetalleDoctor {
     id: number | null;
     doctor_id: number | null;
+    doctor: string;
     license_number: number | null;
     years_of_experience: number | null;
+}
+export interface EspecializacionProps {
+    success: boolean;
+    data: Data;
+    message: string;
+}
+
+export interface DataEspecializacionProps {
+    id: number | null;
+    name: string;
 }
