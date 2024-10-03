@@ -1,8 +1,7 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { UsuariosService } from '@/libs/endpoints/usuarios/usuariosApi';
-import { UsuarioProp } from '@/types/demo';
+import { DetalleDoctor, DetalleDoctor } from '@/types/demo';
 import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -12,34 +11,25 @@ import { Dialog } from 'primereact/dialog';
 import { Controller } from 'react-hook-form';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
-
 import { useTable } from '@/app/hooks/useCrudTable';
+import { DoctoresDetalleService } from '@/libs/endpoints/doctores/doctoresDetalleApi';
+import { DoctoresService } from '@/libs/endpoints/doctores/doctoresApi';
 
-export default function PageUsuarios() {
-    const emptyUser: UsuarioProp = {
+export default function PageDoctoresDetalle() {
+    const emptyUser: DetalleDoctor = {
         id: null,
-
-        first_name: '',
-        last_name: '',
-        phone_number: '',
-        email: '',
-        role_id: null,
-        username: '',
-        password: '',
-        password_confirmation: '',
-        date_of_birth: '',
-        role: {
-            id: 0,
-            name: ''
-        }
+        doctor_id: null,
+        license_number: null,
+        years_of_experience: null
     };
+    const [doctors, setDoctors] = useState<{ id: number; first_name: string; last_name: string }[]>([]);
 
     const {
-        data: usuarios,
+        data: doctores,
         loading,
         dialogVisible,
         deleteDialogVisible,
-        record: usuario,
+        record: doctor,
         openNew,
         hideDialog,
         hideDeleteDialog,
@@ -55,18 +45,31 @@ export default function PageUsuarios() {
         register,
         handleSubmit,
         control,
-        toast
-    } = useTable<UsuarioProp>({
+        toast,
+        errors
+    } = useTable<DetalleDoctor>({
         service: {
-            getAll: UsuariosService.getListarUsuarios,
-            create: UsuariosService.postCrear,
-            update: UsuariosService.putActualizar,
-            delete: UsuariosService.deleteEliminar
+            getAll: DoctoresDetalleService.getListar,
+            create: DoctoresDetalleService.postCrear,
+            update: DoctoresDetalleService.putActualizar,
+            delete: DoctoresDetalleService.deleteEliminar
         },
         initialRecord: emptyUser,
         keyField: 'id'
     });
+    useEffect(() => {
+        // Cargar lista de doctores
+        const loadDoctors = async () => {
+            try {
+                const res = await DoctoresService.getListarDoctores();
+                setDoctors(res.data);
+            } catch (error) {
+                console.error('Error al cargar los doctores:', error);
+            }
+        };
 
+        loadDoctors();
+    }, []);
     const dt = React.useRef<DataTable<any>>(null);
 
     const leftToolbarTemplate = () => (
@@ -75,13 +78,11 @@ export default function PageUsuarios() {
         </div>
     );
 
-  
-
     const rightToolbarTemplate = () => <Button label="Exportar" icon="pi pi-upload" severity="help" onClick={() => dt.current?.exportCSV()} />;
 
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">Tabla de Usuarios</h5>
+            <h5 className="m-0">Tabla de Doctores Detalle</h5>
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" value={globalFilter} onChange={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar..." />
@@ -103,11 +104,11 @@ export default function PageUsuarios() {
         </>
     );
 
-    const codeBodyTemplate = (rowData: UsuarioProp, { rowIndex }: { rowIndex: number }) => {
+    const codeBodyTemplate = (rowData: DetalleDoctor, { rowIndex }: { rowIndex: number }) => {
         return <>{first + rowIndex + 1}</>;
     };
 
-    const actionBodyTemplate = (rowData: UsuarioProp) => (
+    const actionBodyTemplate = (rowData: DetalleDoctor) => (
         <>
             <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editRecord(rowData)} />
             <Button icon="pi pi-trash" rounded severity="warning" onClick={() => confirmDeleteRecord(rowData)} />
@@ -120,65 +121,45 @@ export default function PageUsuarios() {
                 <div className="card">
                     <Toast ref={toast} />
                     <Toolbar className="mb-4" end={leftToolbarTemplate} start={rightToolbarTemplate}></Toolbar>
-                    <DataTable ref={dt} value={usuarios} paginator rows={rows} totalRecords={usuarios.length} first={first} onPage={onPage} loading={loading} globalFilter={globalFilter} header={header}>
+                    <DataTable ref={dt} value={doctores} paginator rows={rows} totalRecords={doctores.length} first={first} onPage={onPage} loading={loading} globalFilter={globalFilter} header={header}>
                         <Column field="id" header="No." body={codeBodyTemplate}></Column>
-                        <Column field="first_name" header="Nombre" sortable></Column>
-                        <Column field="last_name" header="Apellido" sortable></Column>
-                        <Column field="email" header="Correo" sortable></Column>
-                        <Column field="phone_number" header="Teléfono"></Column>
-                        <Column field="role.name" header="Rol" sortable></Column>
+                        <Column field="doctor" header="Doctor" sortable></Column>
+                        <Column field="license_number" header="Licencia" sortable></Column>
+                        <Column field="years_of_experience" header="Años de Experiencia" sortable></Column>
                         <Column body={actionBodyTemplate}></Column>
                     </DataTable>
 
                     <Dialog visible={dialogVisible} style={{ width: '450px' }} header="Usuario" modal className="p-fluid" footer={userDialogFooter} onHide={hideDialog}>
                         <form>
                             <div className="field">
-                                <label htmlFor="first_name">Nombre</label>
-                                <InputText id="first_name" {...register('first_name', { required: true })} autoFocus />
-                            </div>
-                            <div className="field">
-                                <label htmlFor="last_name">Apellido</label>
-                                <InputText id="last_name" {...register('last_name', { required: true })} />
-                            </div>
-                            <div className="field">
-                                <label htmlFor="email">Correo</label>
-                                <InputText id="email" {...register('email', { required: true })} />
-                            </div>
-                            <div className="field">
-                                <label htmlFor="phone_number">Teléfono</label>
-                                <InputText id="phone_number" {...register('phone_number')} />
-                            </div>
-                            <div className="field">
-                                <label htmlFor="username">Usuario</label>
-                                <InputText id="username" {...register('username')} />
-                            </div>
-                            <div className="field">
-                                <label htmlFor="password">Contraseña</label>
-                                <InputText id="password" {...register('password')} type="password" />
-                            </div>
-                            <div className="field">
-                                <label htmlFor="date_of_birth">Fecha de Nacimiento</label>
-                                <InputText id="date_of_birth" {...register('date_of_birth')} placeholder="YYYY-MM-DD" />
-                            </div>
-                            <div className="field">
-                                <label htmlFor="role_id">Rol</label>
+                                <label htmlFor="doctor_id">Doctor</label>
                                 <Controller
-                                    name="role_id"
+                                    name="doctor_id"
                                     control={control}
-                                    render={({ field }) => (
+                                    rules={{ required: 'El doctor es obligatorio' }}
+                                    render={({ field, fieldState }) => (
                                         <Dropdown
-                                            id="role_id"
+                                            id="doctor_id"
                                             value={field.value}
                                             onChange={(e) => field.onChange(e.value)}
-                                            options={[
-                                                { label: 'Administrador', value: 1 },
-                                                { label: 'Médico', value: 2 },
-                                                { label: 'Cliente', value: 3 }
-                                            ]}
-                                            placeholder="Seleccione un Rol"
+                                            options={doctors.map((doctor) => ({
+                                                label: `${doctor.first_name} ${doctor.last_name}`,
+                                                value: doctor.id
+                                            }))}
+                                            placeholder="Seleccione un Doctor"
+                                            className={fieldState.invalid ? 'p-invalid' : ''}
                                         />
                                     )}
                                 />
+                                {errors.doctor_id && <small className="p-error">{errors.doctor_id.message}</small>}
+                            </div>
+                            <div className="field">
+                                <label htmlFor="license_number">Licencia</label>
+                                <InputText id="license_number" {...register('license_number', { required: true })} />
+                            </div>
+                            <div className="field">
+                                <label htmlFor="years_of_experience">Años de experiencia</label>
+                                <InputText id="years_of_experience" {...register('years_of_experience', { required: true })} />
                             </div>
                         </form>
                     </Dialog>
@@ -186,9 +167,9 @@ export default function PageUsuarios() {
                     <Dialog visible={deleteDialogVisible} style={{ width: '450px' }} header="Confirmar" modal footer={deleteUserDialogFooter} onHide={hideDeleteDialog}>
                         <div className="confirmation-content">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {usuario && (
+                            {doctor && (
                                 <span>
-                                    ¿Está seguro de eliminar el usuario <b>{usuario.first_name + ' ' + usuario.last_name}</b>?
+                                    ¿Está seguro de eliminar el doctor <b>{doctor.first_name + ' ' + doctor.last_name}</b>?
                                 </span>
                             )}
                         </div>

@@ -16,29 +16,34 @@ const AppMenu = () => {
         {
             label: 'Usuarios',
             items: [
-                { label: 'Roles', icon: 'pi pi-fw pi-user', to: '/usuarios/roles' },
-                { label: 'Usuarios', icon: 'pi pi-fw pi-users', to: '/usuarios/usuarios' },
-                { label: 'Permisos', icon: 'pi pi-fw pi-wrench', url: 'https://primeflex.org/', target: '_blank' }
+                // { label: 'Roles', icon: 'pi pi-fw pi-user', to: '/usuarios/roles' },
+                { label: 'Usuarios', icon: 'pi pi-fw pi-users', to: '/usuarios/usuarios' }
+                // { label: 'Permisos', icon: 'pi pi-fw pi-wrench', url: 'https://primeflex.org/', target: '_blank' }
             ]
         },
         {
             label: 'Horarios',
-            items: [{ label: 'Gestión de Horarios', icon: 'pi pi-fw pi-hourglass', to: '/uikit/formlayout' }]
+            items: [{ label: 'Gestión de Horarios', icon: 'pi pi-fw pi-hourglass', to: '/horarios' }]
         },
         {
             label: 'Reservas',
-            items: [{ label: 'Gestion de Reservas', icon: 'pi pi-sliders-h', to: '/blocks', badge: 'NEW' }]
+            items: [{ label: 'Gestion de Reservas', icon: 'pi pi-sliders-h', to: '/reservas', badge: 'NEW' }]
         },
 
         {
-            label: 'Recursos',
+            label: 'Doctores',
             icon: 'pi pi-fw pi-briefcase',
-            to: '/pages',
+            to: '/recursos',
             items: [
                 {
-                    label: 'Salas',
-                    icon: 'pi pi-fw pi-sitemap',
-                    to: '/landing'
+                    label: 'Detalles',
+                    icon: 'pi pi-fw pi-users',
+                    to: '/recursos/doctors'
+                },
+                {
+                    label: 'Especializaciones',
+                    icon: 'pi pi-fw pi-users',
+                    to: '/recursos/Specialization'
                 }
             ]
         }

@@ -12,9 +12,10 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
-import { ProductService } from '../../../../demo/service/ProductService';
+// import { ProductService } from '../../../../demo/service/ProductService';
 import { Demo } from '@/types';
-import { RolesService } from '@/libs/endpoints/usuarios/rolesApi';
+
+import { RolesService } from '@/libs/endpoints/usuarios/usuariosApi';
 
 export default function PageRoles() {
     let emptyProduct: Demo.Product = {
