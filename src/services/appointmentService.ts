@@ -1,7 +1,8 @@
+import api from '@/libs/utils';
 import axiosInstance from '../utils/axiosConfig';
 
 export const getAllAppointments = async () => {
-    const response = await axiosInstance.get('/appointment');
+    const response = await api.get('/api/appointment');
     return response.data;
 };
 
