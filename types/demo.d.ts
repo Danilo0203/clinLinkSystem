@@ -4,217 +4,104 @@ import { EventApi, EventInput } from '@fullcalendar/core';
 /* Chart.js Types */
 import { ChartData, ChartOptions } from 'chart.js';
 
-type InventoryStatus = 'INSTOCK' | 'LOWSTOCK' | 'OUTOFSTOCK';
-
-type Status = 'DELIVERED' | 'PENDING' | 'RETURNED' | 'CANCELLED';
-
-export type LayoutType = 'list' | 'grid';
-export type SortOrderType = 1 | 0 | -1;
-
-export interface CustomEvent {
-    name?: string;
-    status?: 'Ordered' | 'Processing' | 'Shipped' | 'Delivered';
-    date?: string;
-    color?: string;
-    icon?: string;
-    image?: string;
+export interface UsuariosProps {
+    success: boolean;
+    data: Data;
+    message: string;
 }
 
-interface ShowOptions {
-    severity?: string;
-    content?: string;
-    summary?: string;
-    detail?: string;
-    life?: number;
+export interface Data {
+    current_page: number;
+    data: Datum;
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: Link[];
+    next_page_url: string;
+    path: string;
+    per_page: number;
+    prev_page_url: string;
+    to: number;
+    total: number;
 }
 
-export interface ChartDataState {
-    barData?: ChartData;
-    pieData?: ChartData;
-    lineData?: ChartData;
-    polarData?: ChartData;
-    radarData?: ChartData;
-}
-export interface ChartOptionsState {
-    barOptions?: ChartOptions;
-    pieOptions?: ChartOptions;
-    lineOptions?: ChartOptions;
-    polarOptions?: ChartOptions;
-    radarOptions?: ChartOptions;
+export interface Datum {
+    id: number;
+    role_id: number;
+    first_name: string;
+    last_name: string;
+    username: string;
+    email: string;
+    phone_number: string;
+    date_of_birth: Date;
+    profile_picture_uri: null;
+    created_at: Date;
+    updated_at: Date;
+    deleted_at: null;
+    role: Role;
+    moduleUserPermissions: any[];
+    doctorDetail: null;
 }
 
-export interface AppMailProps {
-    mails: Demo.Mail[];
+export interface Role {
+    id: number;
+    name: string;
 }
 
-export interface AppMailSidebarItem {
+export interface Link {
+    url: string;
     label: string;
-    icon: string;
-    to?: string;
-    badge?: number;
-    badgeValue?: number;
+    active: boolean;
+}
+export interface UsuarioProp {
+    id: null;
+    role_id: null;
+    first_name: string;
+    last_name: string;
+    username: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+    phone_number: string;
+    date_of_birth: string;
+    role: Role;
+}
+export interface HorariosProps {
+    success: boolean;
+    data: DataHorarios;
+    message: string;
 }
 
-export interface AppMailReplyProps {
-    content: Demo.Mail | null;
-    hide: () => void;
+export interface DataHorarios {
+    id: number | null;
+    doctor_id: number | null;
+    day_of_week: number | null;
+    time_start: Date | string;
+    time_end: Date | string;
+    doctor?: string;
+    day?: string;
+}
+export interface DetallesDoctoresProps {
+    success: boolean;
+    data: Datum[];
+    message: string;
 }
 
-declare namespace Demo {
-    interface Task {
-        id?: number;
-        name?: string;
-        description?: string;
-        completed?: boolean;
-        status?: string;
-        comments?: string;
-        attachments?: string;
-        members?: Member[];
-        startDate?: string;
-        endDate?: string;
-    }
+export interface DetalleDoctor {
+    id: number | null;
+    doctor_id: number | null;
+    doctor: string;
+    license_number: number | null;
+    years_of_experience: number | null;
+}
+export interface EspecializacionProps {
+    success: boolean;
+    data: Data;
+    message: string;
+}
 
-    interface Member {
-        name: string;
-        image: string;
-    }
-
-    interface DialogConfig {
-        visible: boolean;
-        header: string;
-        newTask: boolean;
-    }
-
-    interface Mail {
-        id: number;
-        from: string;
-        to: string;
-        email: string;
-        image: string;
-        title: string;
-        message: string;
-        date: string;
-        important: boolean;
-        starred: boolean;
-        trash: boolean;
-        spam: boolean;
-        archived: boolean;
-        sent: boolean;
-    }
-
-    interface User {
-        id: number;
-        name: string;
-        image: string;
-        status: string;
-        messages: Message[];
-        lastSeen: string;
-    }
-
-    interface Message {
-        text: string;
-        ownerId: number;
-        createdAt: number;
-    }
-
-    //ProductService
-    type Product = {
-        id?: string;
-        code?: string;
-        name: string;
-        description: string;
-        image?: string;
-        price?: number;
-        category?: string;
-        quantity?: number;
-        inventoryStatus?: InventoryStatus;
-        rating?: number;
-        orders?: ProductOrder[];
-        [key: string]: string | string[] | number | boolean | undefined | ProductOrder[] | InventoryStatus;
-    };
-
-    type ProductOrder = {
-        id?: string;
-        productCode?: string;
-        date?: string;
-        amount?: number;
-        quantity?: number;
-        customer?: string;
-        status?: Status;
-    };
-
-    type Payment = {
-        name: string;
-        amount: number;
-        paid: boolean;
-        date: string;
-    };
-
-    //CustomerService
-    type Customer = {
-        id?: number;
-        name?: string;
-        country?: ICountryObject;
-        company?: string;
-        date: Date;
-        status?: string;
-        activity?: number;
-        balance?: number | string;
-        verified?: boolean;
-        amount?: number;
-        price?: number;
-        rating?: number;
-        image?: string;
-        orders?: Demo.Customer[];
-        inventoryStatus?: string;
-        representative: {
-            name: string;
-            image: string;
-        };
-    };
-
-    interface Event extends EventInput {
-        location?: string;
-        description?: string;
-        tag?: {
-            name: string;
-            color: string;
-        };
-    }
-
-    // PhotoService
-    type Photo = {
-        title: string;
-        itemImageSrc?: string | undefined;
-        thumbnailImageSrc?: string | undefined;
-        alt?: string | undefined;
-    };
-
-    type Country = {
-        name: string;
-        code: string;
-    };
-
-    // IconService
-    type Icon = {
-        icon?: {
-            paths?: string[];
-            attrs?: [{}];
-            isMulticolor?: boolean;
-            isMulticolor2?: boolean;
-            grid?: number;
-            tags?: string[];
-        };
-        attrs?: [{}];
-        properties?: {
-            order?: number;
-            id: number;
-            name: string;
-            prevSize?: number;
-            code?: number;
-        };
-        setIdx?: number;
-        setId?: number;
-        iconIdx?: number;
-    };
+export interface DataEspecializacionProps {
+    id: number | null;
+    name: string;
 }

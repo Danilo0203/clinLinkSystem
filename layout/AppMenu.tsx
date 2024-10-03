@@ -11,10 +11,17 @@ const AppMenu = () => {
     const model: AppMenuItem[] = [
         {
             label: 'Inicio',
-            items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/' }]
+            items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' }]
         },
-        
-        
+        {
+            label: 'Usuarios',
+            items: [
+                // { label: 'Roles', icon: 'pi pi-fw pi-user', to: '/usuarios/roles' },
+                { label: 'Usuarios', icon: 'pi pi-fw pi-users', to: '/usuarios/usuarios' }
+                // { label: 'Permisos', icon: 'pi pi-fw pi-wrench', url: 'https://primeflex.org/', target: '_blank' }
+            ]
+        },
+
         {
             label: 'Agenda tu Cita',
             items: [{ label: 'Citas', icon: 'pi pi-sliders-h', to: '/citasClientes', badge: 'NEW' }]
@@ -23,10 +30,24 @@ const AppMenu = () => {
             label: 'Historial Medico',
             items: [{ label: 'Historial', icon: 'pi pi-sliders-h', to: '/historial', badge: 'NEW' }]
         },
-        
-        
 
-       
+        {
+            label: 'Doctores',
+            icon: 'pi pi-fw pi-briefcase',
+            to: '/recursos',
+            items: [
+                {
+                    label: 'Detalles',
+                    icon: 'pi pi-fw pi-users',
+                    to: '/recursos/doctors'
+                },
+                {
+                    label: 'Especializaciones',
+                    icon: 'pi pi-fw pi-users',
+                    to: '/recursos/Specialization'
+                }
+            ]
+        }
         // {
         //     label: 'Hierarchy',
         //     items: [
