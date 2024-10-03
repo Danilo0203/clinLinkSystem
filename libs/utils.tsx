@@ -14,7 +14,9 @@ api.interceptors.request.use(
 
         if (session) {
             // Si tienes el token en el objeto `session`
-            config.headers.Authorization = `Bearer ${session.user.tokken}`;
+            if (session.user && typeof session.user !== 'string') {
+                config.headers.Authorization = `Bearer ${(session.user as any).token}`;
+            }
         }
 
         return config;
