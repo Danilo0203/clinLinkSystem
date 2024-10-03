@@ -136,7 +136,7 @@ const Dashboard = () => {
             toast.current?.show({
                 severity: 'success',
                 summary: 'Inicio de Sesión Exitoso',
-                detail: `El usuario ${session?.user?.user_data?.first_name} inició sesión correctamente`
+                detail: `El usuario ${(session?.user as any)?.user_data?.first_name} inició sesión correctamente`
             });
             setToastShown(!toastShown);
         }
