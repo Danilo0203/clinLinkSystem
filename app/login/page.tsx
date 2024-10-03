@@ -39,7 +39,7 @@ const LogingPage = () => {
     return (
         <div className="min-h-screen text-center py-5">
             <Toast ref={toast} />
-            <h2>Formulario de Inicio de sesión</h2>
+            <h2>Inicio de sesión</h2>
             <form onSubmit={handleSubmit(onSubmit)} className="flex align-items-center justify-content-center">
                 <div className="flex flex-column gap-5 py-2">
                     <FloatLabel>
