@@ -266,7 +266,15 @@ export default function PageHorarios() {
                                     control={control}
                                     rules={{ required: 'La hora de inicio es obligatoria' }}
                                     render={({ field, fieldState }) => (
-                                        <Calendar id="time_start" value={field.value} onChange={(e) => field.onChange(e.value)} timeOnly hourFormat="24" placeholder="Seleccione la hora de inicio" className={fieldState.invalid ? 'p-invalid' : ''} />
+                                        <Calendar
+                                            id="time_start"
+                                            value={field.value instanceof Date ? field.value : new Date()}
+                                            onChange={(e) => field.onChange(e.value)}
+                                            timeOnly
+                                            hourFormat="24"
+                                            placeholder="Seleccione la hora de inicio"
+                                            className={fieldState.invalid ? 'p-invalid' : ''}
+                                        />
                                     )}
                                 />
                                 {errors.time_start && <small className="p-error">{errors.time_start.message}</small>}
@@ -278,7 +286,15 @@ export default function PageHorarios() {
                                     control={control}
                                     rules={{ required: 'La hora de fin es obligatoria' }}
                                     render={({ field, fieldState }) => (
-                                        <Calendar id="time_end" value={field.value} onChange={(e) => field.onChange(e.value)} timeOnly hourFormat="24" placeholder="Seleccione la hora de fin" className={fieldState.invalid ? 'p-invalid' : ''} />
+                                        <Calendar
+                                            id="time_end"
+                                            value={field.value instanceof Date ? field.value : new Date()}
+                                            onChange={(e) => field.onChange(e.value)}
+                                            timeOnly
+                                            hourFormat="24"
+                                            placeholder="Seleccione la hora de fin"
+                                            className={fieldState.invalid ? 'p-invalid' : ''}
+                                        />
                                     )}
                                 />
                                 {errors.time_end && <small className="p-error">{errors.time_end.message}</small>}
@@ -291,7 +307,7 @@ export default function PageHorarios() {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {horario && (
                                 <span>
-                                    ¿Está seguro de eliminar el horario del doctor <b>{horario.doctor}</b> en el día <b>{daysOfWeek[horario.day_of_week - 1]}</b>?
+                                    ¿Está seguro de eliminar el horario del doctor <b>{horario.doctor}</b> en el día <b>{horario.day_of_week !== null ? daysOfWeek[horario.day_of_week - 1] : 'Día no válido'}</b>?
                                 </span>
                             )}
                         </div>
