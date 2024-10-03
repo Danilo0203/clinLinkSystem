@@ -12,11 +12,13 @@ import { Dialog } from 'primereact/dialog';
 import { Controller } from 'react-hook-form';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
+
 import { useTable } from '@/app/hooks/useCrudTable';
 
 export default function PageUsuarios() {
     const emptyUser: UsuarioProp = {
         id: null,
+
         first_name: '',
         last_name: '',
         phone_number: '',
@@ -72,6 +74,8 @@ export default function PageUsuarios() {
             <Button label="Nuevo" icon="pi pi-plus" severity="success" className="mr-2" onClick={openNew} />
         </div>
     );
+
+  
 
     const rightToolbarTemplate = () => <Button label="Exportar" icon="pi pi-upload" severity="help" onClick={() => dt.current?.exportCSV()} />;
 

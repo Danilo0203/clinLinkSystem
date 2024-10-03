@@ -1,0 +1,34 @@
+@layer tailwind-base, primereact, tailwind-utilities;
+
+@layer tailwind-base {
+    @tailwind base;
+}
+
+@layer tailwind-utilities {
+    @tailwind components;
+    @tailwind utilities;
+}
+[class*='col-'] {
+    width: 100%;
+}
+
+/* Estilos para pantallas más grandes (más de 768px) */
+@media only screen and (min-width: 768px) {
+    .col-1 {
+        width: 8.33%;
+    }
+    /* ... otros estilos para columnas ... */
+}
+/* Estilos base para móviles */
+.mi-elemento {
+    font-size: 1rem;
+    /* ... otros estilos ... */
+}
+
+/* Estilos para pantallas más grandes (más de 768px) */
+@media (min-width: 768px) {
+    .mi-elemento {
+        font-size: 1.2rem;
+        /* ... otros estilos adicionales ... */
+    }
+}
