@@ -98,7 +98,7 @@ const Page = () => {
                     <Button label="Registrarse" type="submit" className="p-button-raised p-button-rounded p-button-primary" />
                     <div className="flex flex-column gap-1">
                         <p className="m-0">¿Ya tienes una cuenta?</p>
-                        <Link href="/login">Iniciar sesión</Link>
+                        <Link href="/">Iniciar sesión</Link>
                     </div>
                 </div>
             </form>
