@@ -14,7 +14,7 @@ import { useForm, Controller } from 'react-hook-form';
 const LogingPage = () => {
     const router = useRouter();
     const { register, handleSubmit, control } = useForm();
-    const toast = useRef(null);
+    const toast = useRef<Toast>(null);
     const onSubmit = async (data: any) => {
         try {
             const res = await signIn('credentials', {
@@ -25,13 +25,17 @@ const LogingPage = () => {
             });
 
             if (res?.ok === false) {
-                toast.current.show({ severity: 'error', summary: 'Error al iniciar sesión', detail: res.error });
+                if (toast.current) {
+                    toast.current.show({ severity: 'error', summary: 'Error al iniciar sesión', detail: res.error });
+                }
                 return;
             }
             if (res?.ok) return router.push('/dashboard');
         } catch (error) {
             if (error instanceof AxiosError) {
-                toast.current.show({ severity: 'error', summary: 'Error al iniciar sesión', detail: error });
+                if (toast.current) {
+                    toast.current.show({ severity: 'error', summary: 'Error al iniciar sesión', detail: error.message });
+                }
                 console.error(error.response?.data);
             }
         }
