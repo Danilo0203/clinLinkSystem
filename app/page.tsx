@@ -23,7 +23,6 @@ const LogingPage = () => {
                 password_confirmation: data.password_confirmation,
                 redirect: false
             });
-            console.log(res);
 
             if (res?.ok === false) {
                 if (toast.current) {
