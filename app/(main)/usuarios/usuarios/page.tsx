@@ -75,8 +75,6 @@ export default function PageUsuarios() {
         </div>
     );
 
-  
-
     const rightToolbarTemplate = () => <Button label="Exportar" icon="pi pi-upload" severity="help" onClick={() => dt.current?.exportCSV()} />;
 
     const header = (
@@ -155,6 +153,10 @@ export default function PageUsuarios() {
                             <div className="field">
                                 <label htmlFor="password">Contraseña</label>
                                 <InputText id="password" {...register('password')} type="password" />
+                            </div>
+                            <div className="field">
+                                <label htmlFor="password_confirmation">Contraseña</label>
+                                <InputText id="password_confirmation" {...register('password_confirmation')} type="password" />
                             </div>
                             <div className="field">
                                 <label htmlFor="date_of_birth">Fecha de Nacimiento</label>

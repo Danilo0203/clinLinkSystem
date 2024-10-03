@@ -4,9 +4,9 @@ import { DoctoresService } from './doctoresApi';
 export const DoctoresDetalleService = {
     async getListar() {
         const res = await api.get('/api/doctor-detail');
-        console.log(res.data.data);
+
         const resMedicos = await DoctoresService.getListarDoctores();
-        console.log(resMedicos.data);
+
         const detalle = res.data.data.map((horario: any) => {
             const doctor = resMedicos.data.find((doc: any) => doc.id === horario.doctor_id);
 

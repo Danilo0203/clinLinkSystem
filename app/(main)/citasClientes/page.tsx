@@ -41,7 +41,7 @@ const AppointmentBooking = () => {
             // Fetch available appointments for the selected specialty
             CalendarioService.getListar()
                 .then((data) => {
-                    console.log(data);
+                    
                     setAvailableAppointments(data.data);
                     // setAvailableAppointments(data.filter((appointment: Appointment) => !appointment.booked));
                     setBookedAppointments(data.filter((appointment: Appointment) => appointment.booked));
@@ -49,7 +49,7 @@ const AppointmentBooking = () => {
                 .catch((error) => console.error(error));
         }
     }, [selectedSpecialty]);
-    console.log(availableAppointments);
+    
 
     const bookAppointment = () => {
         if (selectedAppointment) {

@@ -49,7 +49,6 @@ export default function PageEspecializacion() {
         initialRecord: emptyEspecializacion,
         keyField: 'id'
     });
-    console.log(especializaciones);
 
     const dt = useRef<DataTable<any>>(null);
 

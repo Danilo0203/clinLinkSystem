@@ -11,7 +11,6 @@ const api = axios.create({
 api.interceptors.request.use(
     async (config) => {
         const session = await getSession();
-        console.log(session);
 
         if (session) {
             // Si tienes el token en el objeto `session`
