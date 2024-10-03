@@ -105,3 +105,40 @@ export interface DataEspecializacionProps {
     id: number | null;
     name: string;
 }
+export interface ReservarProps {
+    success: boolean;
+    data: Data;
+    message: string;
+}
+
+export interface Data {
+    current_page: number;
+    data: DataReserva[];
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: Link[];
+    next_page_url: null;
+    path: string;
+    per_page: number;
+    prev_page_url: null;
+    to: number;
+    total: number;
+}
+
+export interface DataReserva {
+    id: number | null | string;
+    room_id: number | null | string;
+    appointment_status_id: number | null | string;
+    patient_id: number | null | string;
+    doctor_id: number | null | string;
+    start_timestamp: Date | null;
+    end_timestamp: Date | null;
+}
+
+export interface Link {
+    url: null | string;
+    label: string;
+    active: boolean;
+}

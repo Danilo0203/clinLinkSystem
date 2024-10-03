@@ -1,141 +1,165 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
+
+import { DataReserva } from '@/types/demo';
+import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { Dropdown } from 'primereact/dropdown';
-import { Button } from 'primereact/button';
+import { Toolbar } from 'primereact/toolbar';
+import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
-import { Calendar } from 'primereact/calendar';
 import { Toast } from 'primereact/toast';
-import { getAllAppointments, createAppointment, deleteAppointment, updateAppointment } from '../../../src/services/appointmentService';
-import api from '@/libs/utils';
-import { CalendarioService } from '@/libs/endpoints/calendario/caledarioApi';
 
-interface Appointment {
-    id: string;
-    doctor: string;
-    specialty: string;
-    availableTime: string;
-    booked?: boolean;
-}
+import { useTable } from '@/app/hooks/useCrudTable';
+import { ReservasService } from '@/libs/endpoints/reservas/reservasApi';
 
-const AppointmentBooking = () => {
-    const [specialties, setSpecialties] = useState<string[]>([]);
-    const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
-    const [availableAppointments, setAvailableAppointments] = useState<Appointment[]>([]);
-    const [bookedAppointments, setBookedAppointments] = useState<Appointment[]>([]);
-    const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
-    const [reprogramDialogVisible, setReprogramDialogVisible] = useState(false);
-    const [newAppointmentTime, setNewAppointmentTime] = useState<Date | null>(null);
-    const toast = useRef<Toast>(null);
-
-    useEffect(() => {
-        // Fetch specialties
-        api.get('/api/specialization')
-            .then((response) => setSpecialties(response.data.data))
-            .catch((error) => console.error(error));
-    }, []);
-
-    useEffect(() => {
-        if (selectedSpecialty) {
-            // Fetch available appointments for the selected specialty
-            CalendarioService.getListar()
-                .then((data) => {
-                    
-                    setAvailableAppointments(data.data);
-                    // setAvailableAppointments(data.filter((appointment: Appointment) => !appointment.booked));
-                    setBookedAppointments(data.filter((appointment: Appointment) => appointment.booked));
-                })
-                .catch((error) => console.error(error));
-        }
-    }, [selectedSpecialty]);
-    
-
-    const bookAppointment = () => {
-        if (selectedAppointment) {
-            createAppointment(selectedAppointment)
-                .then((response) => {
-                    toast.current?.show({ severity: 'success', summary: 'Éxito', detail: 'Cita reservada con éxito', life: 3000 });
-                    setBookedAppointments([...bookedAppointments, response.data]);
-                    setAvailableAppointments(availableAppointments.filter((appointment) => appointment.id !== selectedAppointment.id));
-                })
-                .catch((error) => {
-                    toast.current?.show({ severity: 'error', summary: 'Error', detail: 'No se pudo reservar la cita', life: 3000 });
-                    console.error(error);
-                });
-        }
+export default function PageReservas() {
+    const emptyReserva: DataReserva = {
+        id: '',
+        room_id: '',
+        appointment_status_id: '',
+        patient_id: '',
+        doctor_id: '',
+        start_timestamp: null,
+        end_timestamp: null
     };
 
-    const cancelAppointment = (appointmentId: string) => {
-        deleteAppointment(appointmentId)
-            .then((response) => {
-                toast.current?.show({ severity: 'success', summary: 'Éxito', detail: 'Cita cancelada con éxito', life: 3000 });
-                setBookedAppointments(bookedAppointments.filter((appointment) => appointment.id !== appointmentId));
-            })
-            .catch((error) => {
-                toast.current?.show({ severity: 'error', summary: 'Error', detail: 'No se pudo cancelar la cita', life: 3000 });
-                console.error(error);
-            });
-    };
+    const {
+        data: reservas,
+        loading,
+        dialogVisible,
+        deleteDialogVisible,
+        record: reserva,
+        openNew,
+        hideDialog,
+        hideDeleteDialog,
+        saveRecord,
+        editRecord,
+        confirmDeleteRecord,
+        deleteRecord,
+        onPage,
+        globalFilter,
+        setGlobalFilter,
+        first,
+        rows,
+        register,
+        handleSubmit,
+        control,
+        toast
+    } = useTable<DataReserva>({
+        service: {
+            getAll: ReservasService.getListar,
+            create: ReservasService.postCrear,
+            update: ReservasService.putActualizar,
+            delete: ReservasService.deleteEliminar
+        },
+        initialRecord: emptyReserva,
+        keyField: 'id'
+    });
 
-    const reprogramAppointment = () => {
-        if (selectedAppointment && newAppointmentTime) {
-            const updatedAppointment = { ...selectedAppointment, availableTime: newAppointmentTime.toISOString() };
-            updateAppointment(selectedAppointment.id, updatedAppointment)
-                .then((response) => {
-                    toast.current?.show({ severity: 'success', summary: 'Éxito', detail: 'Cita reprogramada con éxito', life: 3000 });
-                    setReprogramDialogVisible(false);
-                    setBookedAppointments(bookedAppointments.map((appointment) => (appointment.id === selectedAppointment.id ? updatedAppointment : appointment)));
-                })
-                .catch((error) => {
-                    toast.current?.show({ severity: 'error', summary: 'Error', detail: 'No se pudo reprogramar la cita', life: 3000 });
-                    console.error(error);
-                });
-        }
-    };
+    const dt = React.useRef<DataTable<any>>(null);
 
-    return (
-        <div>
-            <Toast ref={toast} />
-            <h2>Reservar Cita</h2>
-            <Dropdown value={selectedSpecialty} options={specialties} onChange={(e) => setSelectedSpecialty(e.value)} placeholder="Selecciona una especialidad" optionLabel="name" />
-            <h3>Horarios Disponibles</h3>
-            <DataTable value={availableAppointments} selectionMode="single" onSelectionChange={(e) => setSelectedAppointment(e.value)}>
-                <Column field="doctor_id" header="Doctor" />
-                {/* <Column field="specialty" header="Especialidad" /> */}
-                <Column field="time_start" header="Horario inicio" />
-                <Column field="time_end" header="Horario final" />
-            </DataTable>
-            <Button label="Reservar Cita" onClick={bookAppointment} disabled={!selectedAppointment} />
+    // const leftToolbarTemplate = () => (
+    //     <div className="my-2">
+    //         <Button label="Nuevo" icon="pi pi-plus" severity="success" className="mr-2" onClick={openNew} />
+    //     </div>
+    // );
 
-            <h3>Citas Agendadas</h3>
-            <DataTable value={bookedAppointments} selectionMode="single" onSelectionChange={(e) => setSelectedAppointment(e.value)}>
-                <Column field="doctor" header="Doctor" />
-                <Column field="specialty" header="Especialidad" />
-                <Column field="availableTime" header="Horario" />
-                <Column
-                    body={(rowData: Appointment) => (
-                        <div>
-                            <Button label="Cancelar" onClick={() => cancelAppointment(rowData.id)} />
-                            <Button
-                                label="Reprogramar"
-                                onClick={() => {
-                                    setSelectedAppointment(rowData);
-                                    setReprogramDialogVisible(true);
-                                }}
-                            />
-                        </div>
-                    )}
-                    header="Acciones"
-                />
-            </DataTable>
+    const rightToolbarTemplate = () => <Button label="Exportar" icon="pi pi-upload" severity="help" onClick={() => dt.current?.exportCSV()} />;
 
-            <Dialog header="Reprogramar Cita" visible={reprogramDialogVisible} onHide={() => setReprogramDialogVisible(false)}>
-                <Calendar value={newAppointmentTime} onChange={(e) => setNewAppointmentTime(e.value || null)} showTime />
-                <Button label="Reprogramar" onClick={reprogramAppointment} disabled={!newAppointmentTime} />
-            </Dialog>
+    const header = (
+        <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+            <h5 className="m-0">Tabla de Reservas</h5>
+            <span className="block mt-2 md:mt-0 p-input-icon-left">
+                <i className="pi pi-search" />
+                <InputText type="search" value={globalFilter} onChange={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar..." />
+            </span>
         </div>
     );
-};
 
-export default AppointmentBooking;
+    const userDialogFooter = (
+        <>
+            <Button label="Cancelar" icon="pi pi-times" text onClick={hideDialog} />
+            <Button label="Guardar" icon="pi pi-check" text onClick={handleSubmit(saveRecord)} />
+        </>
+    );
+
+    const deleteUserDialogFooter = (
+        <>
+            <Button label="No" icon="pi pi-times" text onClick={hideDeleteDialog} />
+            <Button label="Sí" icon="pi pi-check" text onClick={deleteRecord} />
+        </>
+    );
+
+    const codeBodyTemplate = (rowData: DataReserva, { rowIndex }: { rowIndex: number }) => {
+        return <>{first + rowIndex + 1}</>;
+    };
+
+    const actionBodyTemplate = (rowData: DataReserva) => (
+        <>
+            <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editRecord(rowData)} />
+            <Button icon="pi pi-trash" rounded severity="warning" onClick={() => confirmDeleteRecord(rowData)} />
+        </>
+    );
+
+    return (
+        <div className="grid crud-demo">
+            <div className="col-12">
+                <div className="card">
+                    <Toast ref={toast} />
+                    <Toolbar className="mb-4" start={rightToolbarTemplate}></Toolbar>
+                    <DataTable ref={dt} value={reservas} paginator rows={rows} totalRecords={reservas.length} first={first} onPage={onPage} loading={loading} globalFilter={globalFilter} header={header}>
+                        <Column field="id" header="No." body={codeBodyTemplate}></Column>
+                        <Column field="room_id" header="Cuarto" sortable></Column>
+                        <Column field="doctor_id" header="Doctor" sortable></Column>
+                        <Column field="patient_id" header="Paciente"></Column>
+                        <Column field="start_timestamp" header="Inicio"></Column>
+                        <Column field="end_timestamp" header="Final"></Column>
+                        <Column field="appointment_status_id" header="Estado Cita" sortable></Column>
+                        <Column body={actionBodyTemplate}></Column>
+                    </DataTable>
+
+                    <Dialog visible={dialogVisible} style={{ width: '450px' }} header="Usuario" modal className="p-fluid" footer={userDialogFooter} onHide={hideDialog}>
+                        <form>
+                            <div className="field">
+                                <label htmlFor="room_id">Cuarto</label>
+                                <InputText id="room_id" {...register('room_id', { required: true })} autoFocus />
+                            </div>
+                            <div className="field">
+                                <label htmlFor="doctor_id">Doctor</label>
+                                <InputText id="doctor_id" {...register('doctor_id', { required: true })} />
+                            </div>
+                            <div className="field">
+                                <label htmlFor="patient_id">Paciente</label>
+                                <InputText id="patient_id" {...register('patient_id', { required: true })} />
+                            </div>
+                            <div className="field">
+                                <label htmlFor="start_timestamp">Incio</label>
+                                <InputText id="start_timestamp" {...register('start_timestamp')} />
+                            </div>
+                            <div className="field">
+                                <label htmlFor="end_timestamp">Final</label>
+                                <InputText id="end_timestamp" {...register('end_timestamp')} />
+                            </div>
+                            <div className="field">
+                                <label htmlFor="appointment_status_id">Estado</label>
+                                <InputText id="appointment_status_id" {...register('appointment_status_id')} />
+                            </div>
+                        </form>
+                    </Dialog>
+
+                    <Dialog visible={deleteDialogVisible} style={{ width: '450px' }} header="Confirmar" modal footer={deleteUserDialogFooter} onHide={hideDeleteDialog}>
+                        <div className="confirmation-content">
+                            <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
+                            {reserva && (
+                                <span>
+                                    ¿Está seguro de cancelar la cita del paciente <b>{reserva.patient_id}</b>?
+                                </span>
+                            )}
+                        </div>
+                    </Dialog>
+                </div>
+            </div>
+        </div>
+    );
+}
