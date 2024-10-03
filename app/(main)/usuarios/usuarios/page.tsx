@@ -155,7 +155,7 @@ export default function PageUsuarios() {
                                 <InputText id="password" {...register('password')} type="password" />
                             </div>
                             <div className="field">
-                                <label htmlFor="password_confirmation">Contraseña</label>
+                                <label htmlFor="password_confirmation">Confirmar Contraseña</label>
                                 <InputText id="password_confirmation" {...register('password_confirmation')} type="password" />
                             </div>
                             <div className="field">
