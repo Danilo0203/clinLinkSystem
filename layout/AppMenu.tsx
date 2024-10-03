@@ -21,13 +21,24 @@ const AppMenu = () => {
                 // { label: 'Permisos', icon: 'pi pi-fw pi-wrench', url: 'https://primeflex.org/', target: '_blank' }
             ]
         },
+
         {
+
+            label: 'Agenda tu Cita',
+            items: [{ label: 'Citas', icon: 'pi pi-sliders-h', to: '/citasClientes', badge: 'NEW' }]
+        },
+        {
+            label: 'Historial Medico',
+            items: [{ label: 'Historial', icon: 'pi pi-sliders-h', to: '/historial', badge: 'NEW' }]
+        },
+      {
             label: 'Horarios',
             items: [{ label: 'Gestión de Horarios', icon: 'pi pi-fw pi-hourglass', to: '/horarios' }]
         },
         {
             label: 'Reservas',
             items: [{ label: 'Gestion de Reservas', icon: 'pi pi-sliders-h', to: '/reservas', badge: 'NEW' }]
+
         },
 
         {
